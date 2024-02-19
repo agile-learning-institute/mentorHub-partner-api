@@ -32,7 +32,7 @@ paths:
         '400':
           description: Bad request due to invalid input
     get:
-      summary: Get a list of partners
+      summary: Get a list of partner's names
       responses:
         '200':
           description: Successful response
@@ -41,7 +41,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Partner'
+                  $ref: '#/components/schemas/Names'
         '404': 
           description: No partners found
 
@@ -212,14 +212,56 @@ components:
   schemas:
     Partner:
       type: object
+      required:
+        - name
       properties:
-        ID:
+        _id:
           type: string
-          format: GUID
+          description: The unique identifier for a partner
         name:
           type: string
+          description: VERSION is the key that identifies a document as a Schema Version document, otherwise it's just the name
+          maxLength: 32
         description:
           type: string
+          description: Description of the partner
+          maxLength: 256
+        version:
+          type: string
+          description: The Schema Version number (only on VERSION document)
+          maxLength: 20
+        status:
+          type: string
+          description: The status of this partnership
+          enum:
+            - Active
+            - Inactive
+            - Archived
+        url:
+          type: string
+          description: Partner Company website
+          maxLength: 256
+          pattern: '^(https?|ftp)://[^\\s/$.?#].[^\\s]*$'
+        contacts:
+          type: array
+          description: Array of contacts associated with this partner
+          items:
+            type: string
+        lastSaved:
+          type: object
+          properties:
+            fromIp:
+              type: string
+              description: Http Request remote IP address
+            byUser:
+              type: string
+              description: UUID Of User
+            atTime:
+              type: string
+              description: The date-time when last updated
+            correlationId:
+              type: string
+              description: The logging correlation ID of the update transaction
     Enums:
       type: object
       properties:
