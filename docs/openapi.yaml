@@ -9,97 +9,143 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.11
+
 paths:
-  /api/partner/:
+  /api/partners:
     post:
       summary: Add a new partner
       operationId: addPartner
       requestBody:
-      
-        description: Partner Name
+        description: Partner details to be added
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Partner'
-        required: true
+              required: true
       responses:
-        '200':
-          description: Successful operation
+        '201':
+          description: Partner added successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'          
-        '405':
-          description: Invalid input
+                $ref: '#/components/schemas/Partner'
+        '400':
+          description: Bad request due to invalid input
     get:
-      summary: Get a list of partner names and ids
-      operationId: getNames
+      summary: Get a list of partners
       responses:
         '200':
-          description: Successful operation
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Names'          
-        '404':
-          description: not found
-        '405':
-          description: Validation exception
-  /api/partner/{id}:
-    patch:
-      summary: Update an existing partner
-      description: Update an existing partner by Id
-      operationId: updatePartner
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partner'
+        '404': 
+          description: No partners found
+
+  /api/partners/{partnerId}:
+    get:
+      summary: Get a partner by ID
       parameters:
-        - name: id
+        - name: partnerId
           in: path
-          description: ID of partner to update
+          description: The ID of the partner to retrieve
+          required: true
+          schema:
+            type: string
+            format: GUID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+        '404':
+          description: Partner not found
+
+    patch:
+      summary: Update a partner by ID
+      parameters:
+        - name: partnerId
+          in: path
+          description: The ID of the partner to update
           required: true
           schema:
             type: string
             format: GUID
       requestBody:
-        description: Updated field
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Partner'
-        required: true
       responses:
         '200':
-          description: Successful operation
+          description: Partner updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'          
+                $ref: '#/components/schemas/Partner'
         '404':
-          description: partner not found
-        '405':
-          description: Validation exception
-    get:
-      summary: Get an existing partner
-      description: Get an existing partner by Id
-      operationId: getPartner
+          description: Partner not found
+
+  /api/partners/{partnerId}/contacts:
+    post:
+      summary: Add a new contact to a partner
       parameters:
-        - name: id
+        - name: partnerId
           in: path
-          description: ID of partner to return
+          description: The ID of the partner to add the contact to
+          required: true
+          schema:
+            type: string
+            format: GUID
+      requestBody:
+        description: Details of the contact to be added
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Partner"
+      responses:
+        '200':
+          description: Contact added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Partner"
+        '400':
+          description: Bad request due to invalid input
+        '404':
+          description: Partner not found
+
+  /api/partners/{partnerId}/contacts/{contactId}:
+    delete:
+      summary: Delete a contact from a partner
+      parameters:
+        - name: partnerId
+          in: path
+          description: The ID of the partner to delete the contact from
+          required: true
+          schema:
+            type: string
+            format: GUID
+        - name: contactId
+          in: path
+          description: The ID of the contact to delete
           required: true
           schema:
             type: string
             format: GUID
       responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Partner'          
+        '204':
+          description: Contact deleted successfully
         '404':
-          description: partner not found
-        '405':
-          description: Validation exception         
-      
+          description: Partner or contact not found
+
   /api/enums/:
     get:
       summary: Get Enumerator Values
@@ -122,6 +168,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Config'    
+
   /api/health/:
     get:
       summary: Check API Health
@@ -159,7 +206,7 @@ paths:
                   error:
                     type: string
                     description: Error message indicating why the service is unavailable
-      
+    
 
 components:
   schemas:
@@ -220,3 +267,29 @@ components:
                   - default
                   - environment
                   - file
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Indicates the status of the API
+          enum:
+            - healthy
+            - unhealthy
+        details:
+          type: object
+          description: Additional details about the health status
+          properties:
+            uptime:
+              type: string
+              description: Time since the API started
+              example: "3 days, 2 hours, 15 minutes"
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+        error:
+          type: string
+          description: Error message indicating why the service is unavailable
+            
