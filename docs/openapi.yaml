@@ -219,10 +219,6 @@ components:
           type: string
           description: Description of the partner
           maxLength: 256
-        version:
-          type: string
-          description: The Schema Version number (only on VERSION document)
-          maxLength: 20
         status:
           type: string
           description: The status of this partnership
