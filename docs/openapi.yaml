@@ -11,7 +11,7 @@ info:
   version: 1.0.11
 
 paths:
-  /api/partner:
+  /api/partner/:
     post:
       summary: Add a new partner
       operationId: addPartner
@@ -48,7 +48,7 @@ paths:
         '405':
           description: Validation exception
 
-  /api/partner/{partnerId}:
+  /api/partner/{partnerId}/:
     get:
       summary: Get an existing partner by ID
       operationId: getPartner
@@ -101,7 +101,7 @@ paths:
         '405':
           description: Validation exception
 
-  /api/partner/{partnerId}/contacts/{contactId}:
+  /api/partner/{partnerId}/contacts/{contactId}/:
     post:
       summary: Add a new contact to a partner
       parameters:
@@ -112,13 +112,13 @@ paths:
           schema:
             type: string
             format: GUID
-      requestBody:
-        description: Details of the contact to be added
-        required: true
-        content:
-          application/json:
-            schema: 
-              $ref: "#/components/schemas/Partner"
+        - name: contactId
+          in: path
+          description: The ID of the person to add to the contact list
+          required: true
+          schema:
+            type: string
+            format: GUID
       responses:
         '200':
           description: Contact added successfully
@@ -152,7 +152,23 @@ paths:
           description: Contact deleted successfully
         '404':
           description: Partner or contact not found
-
+  /api/people/:
+    get:
+      summary: Get a list of people
+      operationId: getPeople
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/People'
+        '404': 
+          description: No partners found
+        '405':
+          description: Validation exception
   /api/enums/:
     get:
       summary: Get Enumerator Values
@@ -243,6 +259,17 @@ components:
             correlationId:
               type: string
               description: The logging correlation ID of the update transaction
+    People:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+            description: MongoDB _id
+          name:
+            type: string
+            description: Name
     Enums:
       type: object
     Names: 
