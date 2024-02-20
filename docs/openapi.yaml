@@ -9,57 +9,81 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.11
+
 paths:
   /api/partner/:
     post:
       summary: Add a new partner
       operationId: addPartner
       requestBody:
-      
-        description: Partner Name
+        description: Partner details to be added
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Partner'
-        required: true
+              required: true
       responses:
         '200':
-          description: Successful operation
+          description: Partner added successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'          
+                $ref: '#/components/schemas/Partner'
         '405':
-          description: Invalid input
+          description: Bad request due to invalid input
     get:
-      summary: Get a list of partner names and ids
+      summary: Get a list of partner's names and ids
       operationId: getNames
       responses:
         '200':
-          description: Successful operation
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Names'          
-        '404':
-          description: not found
+                type: array
+                items:
+                  $ref: '#/components/schemas/Names'
+        '404': 
+          description: No partners found
         '405':
           description: Validation exception
-  /api/partner/{id}:
-    patch:
-      summary: Update an existing partner
-      description: Update an existing partner by Id
-      operationId: updatePartner
+
+  /api/partner/{partnerId}/:
+    get:
+      summary: Get an existing partner by ID
+      operationId: getPartner
       parameters:
-        - name: id
+        - name: partnerId
           in: path
-          description: ID of partner to update
+          description: The ID of the partner to retrieve
+          required: true
+          schema:
+            type: string
+            format: GUID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+        '404':
+          description: Partner not found
+        '405':
+          description: Validation exception '
+
+    patch:
+      summary: Update a partner by ID
+      parameters:
+        - name: partnerId
+          in: path
+          description: The ID of the partner to update
           required: true
           schema:
             type: string
             format: GUID
       requestBody:
-        description: Updated field
+        description: updated partner details
         content:
           application/json:
             schema:
@@ -67,39 +91,84 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful operation
+          description: Partner updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'          
+                $ref: '#/components/schemas/Partner'
         '404':
-          description: partner not found
+          description: Partner not found
         '405':
           description: Validation exception
-    get:
-      summary: Get an existing partner
-      description: Get an existing partner by Id
-      operationId: getPartner
+
+  /api/partner/{partnerId}/contacts/{contactId}/:
+    post:
+      summary: Add a new contact to a partner
       parameters:
-        - name: id
+        - name: partnerId
           in: path
-          description: ID of partner to return
+          description: The ID of the partner to add the contact to
+          required: true
+          schema:
+            type: string
+            format: GUID
+        - name: contactId
+          in: path
+          description: The ID of the person to add to the contact list
           required: true
           schema:
             type: string
             format: GUID
       responses:
         '200':
-          description: Successful operation
+          description: Contact added successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'          
+                $ref: "#/components/schemas/Partner"
+        '400':
+          description: Bad request due to invalid input
         '404':
-          description: partner not found
+          description: Partner not found
+    delete:
+      summary: Delete a contact from a partner
+      parameters:
+        - name: partnerId
+          in: path
+          description: The ID of the partner to delete the contact from
+          required: true
+          schema:
+            type: string
+            format: GUID
+        - name: contactId
+          in: path
+          description: The ID of the contact to delete
+          required: true
+          schema:
+            type: string
+            format: GUID
+      responses:
+        '204':
+          description: Contact deleted successfully
+        '404':
+          description: Partner or contact not found
+  /api/people/:
+    get:
+      summary: Get a list of people
+      operationId: getPeople
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/People'
+        '404': 
+          description: No partners found
         '405':
-          description: Validation exception         
-      
+          description: Validation exception
   /api/enums/:
     get:
       summary: Get Enumerator Values
@@ -122,67 +191,87 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Config'    
+
   /api/health/:
     get:
-      summary: Check API Health
-      description: Returns information about the health of the API
-      operationId: checkHealth
+      summary: Promethius Healthcheck endpoint
+      operationId: getHealth
       responses:
         '200':
-          description: API is healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    description: Indicates the status of the API
-                    enum:
-                      - healthy
-                      - unhealthy
-                  details:
-                    type: object
-                    description: Additional details about the health status
-                    properties:
-                      uptime:
-                        type: string
-                        description: Time since the API started
-                        example: "3 days, 2 hours, 15 minutes"
-        '503':
-          description: Service Unavailable
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message indicating why the service is unavailable
-      
+          description: Successful operation
+    
 
 components:
   schemas:
     Partner:
       type: object
+      required:
+        - name
       properties:
-        ID:
+        _id:
           type: string
-          format: GUID
+          description: The unique identifier for a partner
         name:
           type: string
+          description: VERSION is the key that identifies a document as a Schema Version document, otherwise it's just the name
+          maxLength: 32
         description:
           type: string
+          description: Description of the partner
+          maxLength: 256
+        version:
+          type: string
+          description: The Schema Version number (only on VERSION document)
+          maxLength: 20
+        status:
+          type: string
+          description: The status of this partnership
+          enum:
+            - Active
+            - Inactive
+            - Archived
+        url:
+          type: string
+          description: Partner Company website
+          maxLength: 256
+          pattern: '^(https?|ftp)://[^\\s/$.?#].[^\\s]*$'
+        contacts:
+          type: array
+          description: Array of contacts associated with this partner
+          items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  description: The unique identifier for a contact within a partner
+        lastSaved:
+          type: object
+          properties:
+            fromIp:
+              type: string
+              description: Http Request remote IP address
+            byUser:
+              type: string
+              description: UUID Of User
+            atTime:
+              type: string
+              description: The date-time when last updated
+            correlationId:
+              type: string
+              description: The logging correlation ID of the update transaction
+    People:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+            description: MongoDB _id
+          name:
+            type: string
+            description: Name
     Enums:
       type: object
-      properties:
-        ID:
-          type: string
-          format: GUID
-        name:
-          type: string
-        enumerators:
-          type: string
     Names: 
       type: array
       items:
@@ -194,14 +283,27 @@ components:
             format: uuid
           name:
             description: Name
-            type: string      
+            type: string     
     Config:
       type: object
       properties:
         apiVersion:
           type: string
-        dataVersion:
-          type: string
+          description: Semantic Version Number
+        Stores: 
+          type: array
+          items:
+            type: object
+            properties:
+              CollectionName: 
+                description: Mongodb Collection name
+                type: string
+              Version:
+                description: Schema Version for the collection
+                type: string
+              Filter:
+                description: special Filter applied to collection
+                type: string
         ConfigItems:
           type: array
           items:
