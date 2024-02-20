@@ -11,7 +11,7 @@ info:
   version: 1.0.11
 
 paths:
-  /api/partners:
+  /api/partner:
     post:
       summary: Add a new partner
       operationId: addPartner
@@ -23,16 +23,17 @@ paths:
               $ref: '#/components/schemas/Partner'
               required: true
       responses:
-        '201':
+        '200':
           description: Partner added successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Partner'
-        '400':
+        '405':
           description: Bad request due to invalid input
     get:
-      summary: Get a list of partner's names
+      summary: Get a list of partner's names and ids
+      operationId: getNames
       responses:
         '200':
           description: Successful response
@@ -44,10 +45,13 @@ paths:
                   $ref: '#/components/schemas/Names'
         '404': 
           description: No partners found
+        '405':
+          description: Validation exception
 
-  /api/partners/{partnerId}:
+  /api/partner/{partnerId}:
     get:
-      summary: Get a partner by ID
+      summary: Get an existing partner by ID
+      operationId: getPartner
       parameters:
         - name: partnerId
           in: path
@@ -65,6 +69,8 @@ paths:
                 $ref: '#/components/schemas/Partner'
         '404':
           description: Partner not found
+        '405':
+          description: Validation exception '
 
     patch:
       summary: Update a partner by ID
@@ -77,11 +83,12 @@ paths:
             type: string
             format: GUID
       requestBody:
-        required: true
+        description: updated partner details
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Partner'
+        required: true
       responses:
         '200':
           description: Partner updated successfully
@@ -91,8 +98,10 @@ paths:
                 $ref: '#/components/schemas/Partner'
         '404':
           description: Partner not found
+        '405':
+          description: Validation exception
 
-  /api/partners/{partnerId}/contacts:
+  /api/partner/{partnerId}/contacts:
     post:
       summary: Add a new contact to a partner
       parameters:
@@ -109,20 +118,46 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: "#/components/schemas/Partner"
+              $ref: "#/components/schemas/Contact"
       responses:
         '200':
           description: Contact added successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Partner"
+                $ref: "#/components/schemas/Contact"
         '400':
           description: Bad request due to invalid input
         '404':
           description: Partner not found
-
-  /api/partners/{partnerId}/contacts/{contactId}:
+    patch:
+      summary: Update a contact for a partner
+      parameters:
+        - name: partnerId
+          in: path
+          description: The ID of the partner to update the contact for
+          required: true
+          schema:
+            type: string
+            format: GUID
+      requestBody:
+        description: updated contact details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '404':
+          description: Partner or contact not found
+        '405':
+          description: Validation exception
     delete:
       summary: Delete a contact from a partner
       parameters:
@@ -171,41 +206,11 @@ paths:
 
   /api/health/:
     get:
-      summary: Check API Health
-      description: Returns information about the health of the API
-      operationId: checkHealth
+      summary: Promethius Healthcheck endpoint
+      operationId: getHealth
       responses:
         '200':
-          description: API is healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    description: Indicates the status of the API
-                    enum:
-                      - healthy
-                      - unhealthy
-                  details:
-                    type: object
-                    description: Additional details about the health status
-                    properties:
-                      uptime:
-                        type: string
-                        description: Time since the API started
-                        example: "3 days, 2 hours, 15 minutes"
-        '503':
-          description: Service Unavailable
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message indicating why the service is unavailable
+          description: Successful operation
     
 
 components:
@@ -246,7 +251,7 @@ components:
           type: array
           description: Array of contacts associated with this partner
           items:
-            type: string
+              $ref: '#/components/schemas/Contact'
         lastSaved:
           type: object
           properties:
@@ -262,16 +267,25 @@ components:
             correlationId:
               type: string
               description: The logging correlation ID of the update transaction
+    Contact:
+      type: object
+      required:
+        - id
+        - name
+        - phone
+      properties:
+          id:
+            type: string
+            format: uuid
+            description: The unique identifier for a contact in the people collection
+          name:
+            type: string
+            description: Name of the contact person
+          phone:
+            type: string
+            description: Phone number of the contact person
     Enums:
       type: object
-      properties:
-        ID:
-          type: string
-          format: GUID
-        name:
-          type: string
-        enumerators:
-          type: string
     Names: 
       type: array
       items:
@@ -283,14 +297,27 @@ components:
             format: uuid
           name:
             description: Name
-            type: string      
+            type: string     
     Config:
       type: object
       properties:
         apiVersion:
           type: string
-        dataVersion:
-          type: string
+          description: Semantic Version Number
+        Stores: 
+          type: array
+          items:
+            type: object
+            properties:
+              CollectionName: 
+                description: Mongodb Collection name
+                type: string
+              Version:
+                description: Schema Version for the collection
+                type: string
+              Filter:
+                description: special Filter applied to collection
+                type: string
         ConfigItems:
           type: array
           items:
@@ -309,29 +336,3 @@ components:
                   - default
                   - environment
                   - file
-    HealthStatus:
-      type: object
-      properties:
-        status:
-          type: string
-          description: Indicates the status of the API
-          enum:
-            - healthy
-            - unhealthy
-        details:
-          type: object
-          description: Additional details about the health status
-          properties:
-            uptime:
-              type: string
-              description: Time since the API started
-              example: "3 days, 2 hours, 15 minutes"
-    HealthResponse:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/HealthStatus'
-        error:
-          type: string
-          description: Error message indicating why the service is unavailable
-            
