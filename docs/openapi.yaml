@@ -130,34 +130,6 @@ paths:
           description: Bad request due to invalid input
         '404':
           description: Partner not found
-    patch:
-      summary: Update a contact for a partner
-      parameters:
-        - name: partnerId
-          in: path
-          description: The ID of the partner to update the contact for
-          required: true
-          schema:
-            type: string
-            format: GUID
-      requestBody:
-        description: updated contact details
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Partner'
-        required: true
-      responses:
-        '200':
-          description: Contact updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Partner'
-        '404':
-          description: Partner or contact not found
-        '405':
-          description: Validation exception
     delete:
       summary: Delete a contact from a partner
       parameters:
