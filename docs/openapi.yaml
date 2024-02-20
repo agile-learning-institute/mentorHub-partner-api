@@ -101,7 +101,7 @@ paths:
         '405':
           description: Validation exception
 
-  /api/partner/{partnerId}/contacts:
+  /api/partner/{partnerId}/contacts/{contactId}:
     post:
       summary: Add a new contact to a partner
       parameters:
@@ -118,14 +118,14 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: "#/components/schemas/Contact"
+              $ref: "#/components/schemas/Partner"
       responses:
         '200':
           description: Contact added successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Contact"
+                $ref: "#/components/schemas/Partner"
         '400':
           description: Bad request due to invalid input
         '404':
@@ -145,7 +145,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Contact'
+              $ref: '#/components/schemas/Partner'
         required: true
       responses:
         '200':
@@ -153,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Contact'
+                $ref: '#/components/schemas/Partner'
         '404':
           description: Partner or contact not found
         '405':
@@ -251,7 +251,11 @@ components:
           type: array
           description: Array of contacts associated with this partner
           items:
-              $ref: '#/components/schemas/Contact'
+              type: object
+              properties:
+                _id:
+                  type: string
+                  description: The unique identifier for a contact within a partner
         lastSaved:
           type: object
           properties:
@@ -267,23 +271,6 @@ components:
             correlationId:
               type: string
               description: The logging correlation ID of the update transaction
-    Contact:
-      type: object
-      required:
-        - id
-        - name
-        - phone
-      properties:
-          id:
-            type: string
-            format: uuid
-            description: The unique identifier for a contact in the people collection
-          name:
-            type: string
-            description: Name of the contact person
-          phone:
-            type: string
-            description: Phone number of the contact person
     Enums:
       type: object
     Names: 
