@@ -9,3 +9,5 @@ interface Partner {
     contacts?: ObjectId[];
     // lastSaved?: 
 }
+
+export default Partner; //
