@@ -7,7 +7,7 @@
       "esModuleInterop": true,
       "strict": true
     },
-    // "include": ["src/**/*"], // include all files in the src directory
-    // "exclude": ["node_modules"] // exclude the node_modules directory
+    "include": ["src/**/*"], // include all files in the src directory
+  
   }
   
