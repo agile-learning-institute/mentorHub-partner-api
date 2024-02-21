@@ -51,7 +51,7 @@ paths:
   /api/partner/{partnerId}/:
     get:
       summary: Get an existing partner by ID
-      operationId: getPartner
+      operationId: getPartnerById
       parameters:
         - name: partnerId
           in: path
@@ -74,6 +74,7 @@ paths:
 
     patch:
       summary: Update a partner by ID
+      operationId: updatePartner
       parameters:
         - name: partnerId
           in: path
@@ -104,6 +105,7 @@ paths:
   /api/partner/{partnerId}/contacts/{contactId}/:
     post:
       summary: Add a new contact to a partner
+      operationId: addContact
       parameters:
         - name: partnerId
           in: path
@@ -132,6 +134,7 @@ paths:
           description: Partner not found
     delete:
       summary: Delete a contact from a partner
+      operationId: deleteContact
       parameters:
         - name: partnerId
           in: path

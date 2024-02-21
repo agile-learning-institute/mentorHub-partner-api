@@ -7,7 +7,7 @@
       "esModuleInterop": true,
       "strict": true
     },
-    "include": ["src/**/*"], // include all files in the src directory
+    // "include": ["src/**/*"], // include all files in the src directory
   
   }
   

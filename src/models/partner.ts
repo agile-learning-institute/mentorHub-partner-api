@@ -1,13 +1,17 @@
 import { ObjectId } from 'mongodb';
 
-interface Partner {
+export interface Partner {
     _id?: ObjectId;
     name: string;
     description?: string;
-    status?: 'Active' | 'Inactive' | 'Archived';
+    status?: string;
     url?: string;
-    contacts?: ObjectId[];
-    // lastSaved?: 
+    contacts?: Array<{ _id?: string}>;
+    lastSaved?: {
+        fromIp?: string;
+        byUser?: string;
+        atTime?: string;
+        correlationId?: string;
+    };
 }
 
-export default Partner; //

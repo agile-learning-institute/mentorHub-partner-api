@@ -5,6 +5,7 @@ const app: Express = express();
 const PORT = 3000;
 
 app.use(express.json()); //Middleware to parse JSON
+app.use(express.urlencoded({ extended: true })); //Middleware to parse URL-encoded bodies
 
 //will be put into config file
 // const mongoUrl = 'mongodb://root:example@localhost:27017/?tls=false&directConnection=true'; // Connection URL
@@ -30,6 +31,6 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
     });
 
-app.use('/api', partnerRoutes);
+app.use('/api/partner', partnerRoutes);
 
 
