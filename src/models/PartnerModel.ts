@@ -6,10 +6,10 @@ export class PartnerModel {
         return true;
     }
 
-    getNames(): boolean {
-        console.log('Hello World from getNames');
-        return true;
-    }
+    // getNames(): boolean {
+    //     console.log('Hello World from getNames');
+    //     return true;
+    // }
 
     getPartnerById(_id: string): boolean {
         console.log('Hello World from getPartner');

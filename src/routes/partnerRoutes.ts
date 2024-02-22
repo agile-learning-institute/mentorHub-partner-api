@@ -9,10 +9,10 @@ router.post('/', (req, res) => {
      res.send('Hello World from addPartner');
 });
 
-router.get('/', (req, res) => {
-    partnerController.getNames();
-    res.send('Hello World from getNames');
-});
+// router.get('/', (req, res) => {
+//     partnerController.getNames();
+//     res.send('Hello World from getNames');
+// });
 
 router.get('/:partnerId', (req, res) => {
     partnerController.getPartnerById();

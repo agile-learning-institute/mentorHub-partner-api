@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import partnerRoutes from './routes/partnerRoutes';
-// import peopleRoutes from './routes/peopleRoutes';
+import peopleRoutes from './routes/peopleRoutes';
 // import enumsRoutes from './routes/enumsRoutes';
 // import configRoutes from './routes/configRoutes';
 // import healthRoutes from './routes/healthRoutes';
@@ -10,6 +10,7 @@ const PORT = 3000;
 
 app.use(express.json()); //Middleware to parse JSON
 app.use('/api/partner', partnerRoutes);
+app.use('/api/people', peopleRoutes);
 app.use(express.urlencoded({ extended: true })); //Middleware to parse URL-encoded bodies
 
 //will be put into config file

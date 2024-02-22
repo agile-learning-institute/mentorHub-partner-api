@@ -11,9 +11,9 @@ export class PartnerController {
     console.log("hello world from addPartner");
   }
 
-  getNames(): void {
-    console.log("hello world from getNames");
-  }
+  // getNames(): void {
+  //   console.log("hello world from getNames");
+  // }
 
   getPartnerById(): void {
     console.log("hello world from getPartner");
