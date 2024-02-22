@@ -11,7 +11,7 @@ export class PartnerModel {
         return true;
     }
 
-    getPartnerById(partnerId: string): boolean {
+    getPartnerById(_id: string): boolean {
         console.log('Hello World from getPartner');
         return true;
     }

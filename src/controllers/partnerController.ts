@@ -7,31 +7,27 @@ export class PartnerController {
     this.partnerModel = new PartnerModel();
   }
 
-  addPartner(req: any, res: any): void {
-    console.log('hello world from addPartner');
+  addPartner(): void {
+    console.log("hello world from addPartner");
   }
 
-  getNames(req: any, res: any): void {
-    console.log('hello world from getNames');
+  getNames(): void {
+    console.log("hello world from getNames");
   }
 
-  getPartnerById(req: any, res: any): void {    
-    const result = this.partnerModel.getPartnerById(req.params.partnerId);
-    res.send(`Get Partner: ${result}`);
+  getPartnerById(): void {
+    console.log("hello world from getPartner");
   }
 
-  updatePartner(req: any, res: any): void { 
-    const result = this.partnerModel.updatePartner(req.params.partnerId, req.body);
-    res.send(`Update Partner: ${result}`);
+  updatePartner(): void {
+    console.log("hello world from updatePartner");
   }
 
-  addContact(req: any, res: any): void {
-    const result = this.partnerModel.addContact(req.params.partnerId, req.body);
-    res.send(`Add Contact: ${result}`);
+  addContact(): void {
+    console.log("hello world from addContact");
   }
 
-  deleteContact(req: any, res: any): void {
-    const result = this.partnerModel.deleteContact(req.params.partnerId, req.params.contactId);
-    res.send(`Delete Contact: ${result}`);
+  deleteContact(): void {
+    console.log("hello world from deleteContact");
   }
 }
