@@ -1,4 +1,4 @@
-import { Partner } from './Partner'; //
+import { Partner } from './PartnerInterface'; //
 
 export class PartnerModel {
     addPartner(partnerData: any): boolean {
