@@ -231,9 +231,17 @@ components:
             ^(https?:\/\/)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z-]{2,24}(:[0-9]{1,5})?(\/(([\w\-\.~]|%[a-fA-F0-9]{2}|[!\$&'\(\)\*\+,;=:@])*\/?)*)?
           type: string
         contacts:
-          description: Array of personID associated with this partner
+          description: Array of People associated with this partner
           items:
-            type: string
+            type: object
+            description: Contact information
+            properties:
+              firstName: 
+                type: string
+              lastName:
+                type: string
+              phone:
+                type: string
           type: array
         lastSaved:
           type: object
