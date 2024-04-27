@@ -14,44 +14,44 @@ paths:
   /api/partner/:
     post:
       summary: Add a new partner
-      operationId: addPartner
+      operationId: addpartner
       requestBody:
-        description: Partner details to be added
+        description: partner details to be added
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Partner'
+              $ref: "#/components/schemas/partner"
               required: true
       responses:
-        '200':
-          description: Partner added successfully
+        "200":
+          description: partner added successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'
-        '405':
+                $ref: "#/components/schemas/partner"
+        "405":
           description: Bad request due to invalid input
     get:
       summary: Get a list of partner's names and ids
       operationId: getNames
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Names'
-        '404': 
+                  $ref: "#/components/schemas/names"
+        "404":
           description: No partners found
-        '405':
+        "405":
           description: Validation exception
 
   /api/partner/{partnerId}/:
     get:
       summary: Get an existing partner by ID
-      operationId: getPartnerById
+      operationId: getpartnerById
       parameters:
         - name: partnerId
           in: path
@@ -61,20 +61,20 @@ paths:
             type: string
             format: GUID
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'
-        '404':
-          description: Partner not found
-        '405':
+                $ref: "#/components/schemas/partner"
+        "404":
+          description: partner not found
+        "405":
           description: Validation exception '
 
     patch:
       summary: Update a partner by ID
-      operationId: updatePartner
+      operationId: updatepartner
       parameters:
         - name: partnerId
           in: path
@@ -88,18 +88,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Partner'
+              $ref: "#/components/schemas/partner"
         required: true
       responses:
-        '200':
-          description: Partner updated successfully
+        "200":
+          description: partner updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner'
-        '404':
-          description: Partner not found
-        '405':
+                $ref: "#/components/schemas/partner"
+        "404":
+          description: partner not found
+        "405":
           description: Validation exception
 
   /api/partner/{partnerId}/contacts/{contactId}/:
@@ -122,16 +122,16 @@ paths:
             type: string
             format: GUID
       responses:
-        '200':
+        "200":
           description: Contact added successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Partner"
-        '400':
+                $ref: "#/components/schemas/partner"
+        "400":
           description: Bad request due to invalid input
-        '404':
-          description: Partner not found
+        "404":
+          description: partner not found
     delete:
       summary: Delete a contact from a partner
       operationId: deleteContact
@@ -151,114 +151,110 @@ paths:
             type: string
             format: GUID
       responses:
-        '204':
+        "204":
           description: Contact deleted successfully
-        '404':
-          description: Partner or contact not found
+        "404":
+          description: partner or contact not found
   /api/people/:
     get:
-      summary: Get a list of people
+      summary: Get a list of people whose name constains the search query
       operationId: getPeople
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: The name to search for
+          required: true
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/People'
-        '404': 
+                  $ref: "#/components/schemas/names"
+        "404":
           description: No partners found
-        '405':
+        "405":
           description: Validation exception
-  /api/enums/:
-    get:
-      summary: Get Enumerator Values
-      operationId: getEnums
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Enums'          
   /api/config/:
     get:
       summary: Get API Configuration Information
       operationId: getConfig
       responses:
-        '200':
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Config'    
+                $ref: "#/components/schemas/config"
 
   /api/health/:
     get:
       summary: Promethius Healthcheck endpoint
       operationId: getHealth
       responses:
-        '200':
+        "200":
           description: Successful operation
-    
 
 components:
   schemas:
-    Partner:
+    partner:
       type: object
       required:
+        - _id
         - name
       properties:
         _id:
-          type: string
           description: The unique identifier for a partner
+          type: string
         name:
+          description: Partner name
+          pattern: ^[ -~]{0,256}$
           type: string
-          description: VERSION is the key that identifies a document as a Schema Version document, otherwise it's just the name
-          maxLength: 32
         description:
-          type: string
           description: Description of the partner
-          maxLength: 256
-        status:
+          pattern: ^[ -~]{0,256}$
           type: string
+        status:
           description: The status of this partnership
           enum:
             - Active
             - Inactive
             - Archived
-        url:
           type: string
+        url:
           description: Partner Company website
-          maxLength: 256
-          pattern: '^(https?|ftp)://[^\\s/$.?#].[^\\s]*$'
+          pattern: >-
+            ^(https?:\/\/)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z-]{2,24}(:[0-9]{1,5})?(\/(([\w\-\.~]|%[a-fA-F0-9]{2}|[!\$&'\(\)\*\+,;=:@])*\/?)*)?
+          type: string
         contacts:
-          type: array
-          description: Array of contacts associated with this partner
+          description: Array of personID associated with this partner
           items:
-              type: object
-              properties:
-                _id:
-                  type: string
-                  description: The unique identifier for a contact within a partner
+            type: string
+          type: array
         lastSaved:
           type: object
+          description: Change tracking breadcrumb
           properties:
             fromIp:
-              type: string
               description: Http Request remote IP address
+              pattern: >-
+                ^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$
+              type: string
             byUser:
-              type: string
               description: UUID Of User
+              type: string
             atTime:
-              type: string
               description: The date-time when last updated
-            correlationId:
               type: string
+            correlationId:
               description: The logging correlation ID of the update transaction
-    People:
+              type: string
+          additionalProperties: false
+    names:
       type: array
       items:
         type: object
@@ -269,45 +265,17 @@ components:
           name:
             type: string
             description: Name
-    Enums:
-      type: object
-    Names: 
-      type: array
-      items:
-        type: object
-        properties: 
-          ID:
-            description: MongoDB _id
-            type: string
-            format: uuid
-          name:
-            description: Name
-            type: string     
-    Config:
+    config:
       type: object
       properties:
         apiVersion:
           type: string
-          description: Semantic Version Number
-        Stores: 
+          description: Symantic Version Number
+        configItems:
           type: array
           items:
             type: object
             properties:
-              CollectionName: 
-                description: Mongodb Collection name
-                type: string
-              Version:
-                description: Schema Version for the collection
-                type: string
-              Filter:
-                description: special Filter applied to collection
-                type: string
-        ConfigItems:
-          type: array
-          items:
-            type: object
-            properties: 
               name:
                 description: Conf Item Name (Env Var Name, File Name)
                 type: string
@@ -321,3 +289,31 @@ components:
                   - default
                   - environment
                   - file
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                description: Collection Version Document ID
+                type: string
+              collectionName:
+                description: Mongodb Collection name
+                type: string
+              currentVersion:
+                description: Schema Version for the collection
+                type: string
+        enumerators:
+          type: object
+        mentors:
+          description: List of all members with role Mentor
+          type: array
+          items:
+            type: object
+            properties:
+              ID:
+                description: MongoDB _id
+                type: string
+              name:
+                description: Name
+                type: string
