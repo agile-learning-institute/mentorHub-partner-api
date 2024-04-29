@@ -1,30 +1,34 @@
-# <<TODO:domain>>-<<TODO:component>>
+# mentorhub-partner-api
 
-This is repository contains <<TODO:service-description>>
-
-[Here](https://github.com/orgs/agile-learning-institute/repositories?q=mentorhub-&type=all&sort=name) are all of the repositories in the [mentorHub](https://github.com/agile-learning-institute/mentorhub/tree/main) system
+This is repository contains the API for the Partner microservice.
+- This uses the [mentorhub-mongodb](https://github.com/agile-learning-institute/mentorHub-mongodb) project for a database with test data
+- This API supports the [mentorhub-partnerui](https://github.com/agile-learning-institute/mentorHub-partner-ui) front end.
 
 ## Prerequisites
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- TODO: Additional Prerequisites
+- [mentorHub Developers Edition](https://github.com/agile-learning-institute/mentorHub/tree/main/mentorHub-developer-edition)
+- NodeJS
 
 ## Contributing
 
-Instructions on how to contribute, how to install dependencies and run locally. Including how to run backing services locally.
-
-## Build and test the container
-
-Use the following command to build and run the container locally. See [here for details](https://github.com/agile-learning-institute/mentorhub/blob/main/docker-compose/README.md) on how to stop/start the database.
-
+### Install dependencies
 ```bash
-../src/docker/docker-build.sh
+npm install
 ```
 
-After that command completes successfully you can verify it worked successfully by
+### Build Typescript for deployment
+```bash
+npm run build
+```
 
-- TODO: Describe functional baseline tests
+### Run the API locally
+```bash
+npm run start
+```
+NOTE: This will also start the backing database and initlize test data
 
-## Refactors and Enhancements
-
-- [ ] To Be Documented
+### Build and Test the API container locally
+```bash
+npm run container
+```
+NOTE: This will also start the backing database and initlize test data
