@@ -1,12 +1,21 @@
 import express from 'express';
+import Config from './config/Config'
+import PartnerRoutes from './routes/PartnerRoutes';
+import ConfigRoutes from './routes/ConfigRoutes';
+import MongoIO from './config/MongoIO'
 
 const app = express();
-const port = process.env.PORT || 3000;
+const config = new Config();
+const mongo = new MongoIO(config);
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
+const port = config.getPort();
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.use(express.json());
+app.use('/api', PartnerRoutes);
+app.use('/api/config/', ConfigRoutes)
+
+mongo.connect().then(() => {
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    });
 });
