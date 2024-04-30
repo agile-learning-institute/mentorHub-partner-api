@@ -11,13 +11,13 @@ describe('Config', () => {
         expect(config.getConfigFolder()).toBe("/opt/mentorhub-partner-api");
     });
 
-    test('test PORT', () => {
-        testConfigDefaultValue("PORT","8084");
-    });
-
     test('test getPort', () => {
         config = new Config();
         expect(config.getPort()).toEqual(8084);
+    });
+
+    test('test PORT', () => {
+        testConfigDefaultValue("PORT","8084");
     });
 
     test('test BUILT_AT', () => {
@@ -33,7 +33,11 @@ describe('Config', () => {
     });
 
     test('test DB_NAME', () => {
-        testConfigDefaultValue("DB_NAME","test");
+        testConfigDefaultValue("DB_NAME","mentorHub");
+    });
+
+    test('test PARTNER_COLLECTION', () => {
+        testConfigDefaultValue("PARTNER_COLLECTION","partners");
     });
 
     function testConfigDefaultValue(configName: string, expectedValue: string) {

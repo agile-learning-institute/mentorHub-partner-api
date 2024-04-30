@@ -3,20 +3,6 @@ import { IntegerType } from "mongodb";
 import { join } from 'path';
 
 /**
- * A config item, used to track where configuration values were found
- */
-interface ConfigItem {
-    name: string;
-    value: string;
-    from: string;
-}
-
-interface CollectionVersion {
-  collectionName: string;
-  versionNumber: string
-}
-
-/**
  * Class Config: This class manages configuration values 
  *      from the enviornment or configuration files, 
  *      and abstracts all file and mongodb i-o.
@@ -26,10 +12,11 @@ export default class Config {
     private versions: CollectionVersion[] = [];
     private enumerators: any;         
     
-    private configFolder: string = "";
-    private port: IntegerType = 8084;
+    private configFolder: string = "./";
+    private port: IntegerType;
     private connectionString: string;       
     private dbName: string;
+    private partnerCollectionName: string;
 
     /**
      * Constructor gets configuration values, loads the enumerators, and logs completion
@@ -39,7 +26,8 @@ export default class Config {
         this.configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
         this.port = parseInt(this.getConfigValue("PORT", "8084", false));
         this.connectionString = this.getConfigValue("CONNECTION_STRING", "mongodb://root:example@localhost:27017", true);
-        this.dbName = this.getConfigValue("DB_NAME", "test", false);
+        this.dbName = this.getConfigValue("DB_NAME", "mentorHub", false);
+        this.partnerCollectionName = this.getConfigValue("PARTNER_COLLECTION", "partners", false);
 
         console.info("Configuration Initilized:", JSON.stringify(this.configItems));
     }
@@ -103,6 +91,10 @@ export default class Config {
      */
     public getPort(): IntegerType {
         return this.port;
+    }
+
+    public getPartnerCollectionName(): string {
+        return this.partnerCollectionName;
     }
 
     public getConfigItems(): ConfigItem[] {

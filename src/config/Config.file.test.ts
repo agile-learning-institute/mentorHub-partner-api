@@ -21,6 +21,14 @@ describe('Config', () => {
         testConfigFileValue("DB_NAME");
     });
 
+    test('test PORT', () => {
+        testConfigFileValue("PORT");
+    });
+
+    test('test PARTNER_COLLECTION', () => {
+        testConfigFileValue("PARTNER_COLLECTION");
+    });
+
     function testConfigFileValue(configName: string) {
         const items = config.getConfigItems();
 

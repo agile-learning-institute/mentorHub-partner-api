@@ -22,6 +22,14 @@ describe('Config', () => {
         testConfigEnvironmentValue("DB_NAME");
     });
 
+    test('test PORT', () => {
+        testConfigEnvironmentValue("PORT");
+    });
+
+    test('test PARTNER_COLLECTION', () => {
+        testConfigEnvironmentValue("PARTNER_COLLECTION");
+    });
+
     function testConfigEnvironmentValue(configName: string) {
         process.env[configName] = "ENVIRONMENT";
         config = new Config();
