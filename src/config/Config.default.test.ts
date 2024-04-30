@@ -40,6 +40,14 @@ describe('Config', () => {
         testConfigDefaultValue("PARTNER_COLLECTION","partners");
     });
 
+    test('test PEOPLE_COLLECTION', () => {
+        testConfigDefaultValue("PEOPLE_COLLECTION","people");
+    });
+
+    test('test VERSION_COLLECTION', () => {
+        testConfigDefaultValue("VERSION_COLLECTION","msmCurrentVersions");
+    });
+
     function testConfigDefaultValue(configName: string, expectedValue: string) {
         config = new Config();
 

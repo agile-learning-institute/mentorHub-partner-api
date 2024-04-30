@@ -29,6 +29,14 @@ describe('Config', () => {
         testConfigFileValue("PARTNER_COLLECTION");
     });
 
+    test('test PEOPLE_COLLECTION', () => {
+        testConfigFileValue("PEOPLE_COLLECTION");
+    });
+
+    test('test VERSION_COLLECTION', () => {
+        testConfigFileValue("VERSION_COLLECTION");
+    });
+
     function testConfigFileValue(configName: string) {
         const items = config.getConfigItems();
 

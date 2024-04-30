@@ -17,6 +17,9 @@ export default class Config {
     private connectionString: string;       
     private dbName: string;
     private partnerCollectionName: string;
+    private peopleCollectionName: string
+    private msmVersionCollection: string;
+
 
     /**
      * Constructor gets configuration values, loads the enumerators, and logs completion
@@ -28,6 +31,8 @@ export default class Config {
         this.connectionString = this.getConfigValue("CONNECTION_STRING", "mongodb://root:example@localhost:27017", true);
         this.dbName = this.getConfigValue("DB_NAME", "mentorHub", false);
         this.partnerCollectionName = this.getConfigValue("PARTNER_COLLECTION", "partners", false);
+        this.peopleCollectionName = this.getConfigValue("PEOPLE_COLLECTION", "people", false);
+        this.msmVersionCollection = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
 
         console.info("Configuration Initilized:", JSON.stringify(this.configItems));
     }
@@ -95,6 +100,14 @@ export default class Config {
 
     public getPartnerCollectionName(): string {
         return this.partnerCollectionName;
+    }
+
+    public getPeopleCollectionName(): string {
+        return this.peopleCollectionName;
+    }
+
+    public getMsmVersionCollection(): string {
+        return this.msmVersionCollection;
     }
 
     public getConfigItems(): ConfigItem[] {

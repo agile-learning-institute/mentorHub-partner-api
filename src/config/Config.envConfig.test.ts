@@ -30,6 +30,14 @@ describe('Config', () => {
         testConfigEnvironmentValue("PARTNER_COLLECTION");
     });
 
+    test('test PEOPLE_COLLECTION', () => {
+        testConfigEnvironmentValue("PEOPLE_COLLECTION");
+    });
+
+    test('test VERSION_COLLECTION', () => {
+        testConfigEnvironmentValue("VERSION_COLLECTION");
+    });
+
     function testConfigEnvironmentValue(configName: string) {
         process.env[configName] = "ENVIRONMENT";
         config = new Config();
