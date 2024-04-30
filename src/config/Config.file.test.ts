@@ -2,7 +2,7 @@
  * This set of unit tests test config init from files
  * and uses the files in /test/configTest
  */
-import { Config } from './Config';
+import Config from './Config';
 
 describe('Config', () => {
     let config: Config;

@@ -1,7 +1,7 @@
 /**
  * This set of unit tests test config init from env
  */
-import { Config } from './Config';
+import Config from './Config';
 
 describe('Config', () => {
     let config: Config;
