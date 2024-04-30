@@ -1,8 +1,7 @@
+import {getConfig} from '../controllers/ConfigController'
 import express from 'express';
 const router = express.Router();
 
-import { getConfig } from '../controllers/ConfigController';
-
-router.get('/api/config/', getConfig);
+router.get('/', getConfig);
 
 export default router;

@@ -1,11 +1,11 @@
-import express from 'express';
-const router = express.Router();
+import { Router } from 'express';
+import { getPartners, getPartner, createPartner, updatePartner } from '../controllers/PartnerController';
 
-import { getPartner, getPartners, createPartner, updatePartner } from '../controllers/PartnerController';
+const router = Router();
 
-router.get('/api/partner/', getPartners);
-router.get('/api/partner/', getPartner);
-router.post('/api/partner/', createPartner);
-router.patch('/api/partner/', updatePartner);
+router.get('/', getPartners);
+router.get('/:id', getPartner);
+router.post('/:id', createPartner);
+router.patch('/:id', updatePartner);
 
 export default router;

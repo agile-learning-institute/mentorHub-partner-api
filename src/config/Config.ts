@@ -21,7 +21,7 @@ interface CollectionVersion {
  *      from the enviornment or configuration files, 
  *      and abstracts all file and mongodb i-o.
  */
-export class Config {
+export default class Config {
     private configItems: ConfigItem[] = []; 
     private versions: CollectionVersion[] = [];
     private enumerators: any;         
