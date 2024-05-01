@@ -52,37 +52,44 @@ NOTE: Not Yet Functional
 
 ```bash
 curl http://localhost:8084/api/config/
-
 ```
 
 ### Get Partner Names
 
 ```bash
 curl http://localhost:8084/api/partner/
-
 ```
 
 ### Test get a partner
 
 ```bash
 curl http://localhost:8084/api/partner/bbbb00000000000000000000
-
 ```
 
-### Test add a person
+### Test add a partner
 
 ```bash
 curl -X POST http://localhost:8084/api/partner/ \
      -d '{"name":"Foo", "description":"Some short description"}'
-
 ```
 
-### Test update a person
+### Test update a partner
 
 ```bash
-curl -X PATCH http://localhost:8084/api/person/aaaa00000000000000000021 \
+curl -X PATCH http://localhost:8084/api/partner/bbbb00000000000000000000 \
      -d '{"description":"Some long description"}'
+```
 
+### Test Add a contact to a partner
+
+```bash
+curl -X POST http://localhost:8084/api/partner/bbbb00000000000000000000/contact/AAAA00000000000000000000
+```
+
+### Test Remove a contct from a  partner
+
+```bash
+curl -X PATCH http://localhost:8084/api/partner/bbbb00000000000000000000contact/AAAA00000000000000000000
 ```
 
 ## Observability and Configuration
