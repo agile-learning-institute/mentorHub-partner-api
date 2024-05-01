@@ -1,3 +1,5 @@
+import { ConfigItem } from "../interfaces/ConfigItem";
+import { CollectionVersion } from "../interfaces/CollectionVersion";
 import { existsSync, readFileSync } from "fs";
 import { IntegerType } from "mongodb";
 import { join } from 'path';
@@ -8,13 +10,13 @@ import { join } from 'path';
  *      and abstracts all file and mongodb i-o.
  */
 export default class Config {
-    private configItems: ConfigItem[] = []; 
+    private configItems: ConfigItem[] = [];
     private versions: CollectionVersion[] = [];
-    private enumerators: any;         
-    
+    private enumerators: any;
+
     private configFolder: string = "./";
     private port: IntegerType;
-    private connectionString: string;       
+    private connectionString: string;
     private dbName: string;
     private partnerCollectionName: string;
     private peopleCollectionName: string
@@ -81,7 +83,7 @@ export default class Config {
             return this.enumerators[version].enumerators[name];
         } else {
             throw new Error("Enumerator does not exist:" + name);
-        } 
+        }
     }
 
     /**

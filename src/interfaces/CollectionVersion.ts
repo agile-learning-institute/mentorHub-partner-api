@@ -1,6 +1,5 @@
-interface CollectionVersion {
-    collectionName: string;
-    versionNumber: string
-  }
-  
-  
+export interface CollectionVersion {
+  collectionName: string;
+  versionNumber: string
+}
+
