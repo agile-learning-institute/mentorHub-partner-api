@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "This is repository contains the API for the Partner microservice. - This uses the [mentorhub-mongodb](https://github.com/agile-learning-institute/mentorHub-mongodb) project for a database with test data - This API supports the [mentorhub-partnerui](https://github.com/agile-learning-institute/mentorHub-partner-ui) front end.",
   "scripts": {
-    "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "ts-node src/server.ts"
+    "prestart": "mh up mongodb",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "precontainer": "docker build --tag ghcr.io/agile-learning-institute/mentorhub-partner-api:latest .",
+    "container": "mh up partner-api"
   },
   "main": "index.js",
   "directories": {
@@ -65,12 +68,12 @@
     "execa": "^5.1.1",
     "exit": "^0.1.2",
     "expect": "^29.7.0",
+    "express": "^4.19.2",
     "fast-json-stable-stringify": "^2.1.0",
     "fb-watchman": "^2.0.2",
     "fill-range": "^7.0.1",
     "find-up": "^4.1.0",
     "fs.realpath": "^1.0.0",
-    "fsevents": "^2.3.3",
     "function-bind": "^1.1.2",
     "gensync": "^1.0.0-beta.2",
     "get-caller-file": "^2.0.5",

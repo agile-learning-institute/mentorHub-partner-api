@@ -4,7 +4,7 @@ FROM node:16 AS build
 # Install dependencies
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --production
 
 # Build server deployment 
 COPY . .
@@ -25,10 +25,14 @@ FROM node:16 AS run
 # ENV LOAD_TEST_DATA=false
 
 # Copy built assets from build stage 
-COPY --from=build /app/dist /opt/dist
+RUN mkdir -p /opt/app && chown node:node /opt/app
+WORKDIR /opt/app
+
+COPY --from=build /app/dist /opt/app
+COPY --from=build /app/node_modules /opt/app/node_modules
 
 # Set the working directory
-WORKDIR /opt/dist
+WORKDIR /opt/app
 
 # Run the processor
 ENTRYPOINT ["node", "server.js"]

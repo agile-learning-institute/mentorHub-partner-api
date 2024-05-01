@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/', getPartners);
 router.get('/:id', getPartner);
-router.post('/:id', createPartner);
+router.post('/', createPartner);
 router.patch('/:id', updatePartner);
 
 export default router;
