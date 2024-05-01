@@ -7,7 +7,7 @@ This is repository contains the API for the Partner microservice.
 ## Prerequisites
 
 - [mentorHub Developers Edition](https://github.com/agile-learning-institute/mentorHub/tree/main/mentorHub-developer-edition)
-- NodeJS
+- [NodeJS](https://nodejs.org/en/download)
 
 ## Contributing
 
