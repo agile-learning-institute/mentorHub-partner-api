@@ -38,6 +38,10 @@ describe('Config', () => {
         testConfigEnvironmentValue("VERSION_COLLECTION");
     });
 
+    test('test ENUMERATORS_COLLECTION', () => {
+        testConfigEnvironmentValue("ENUMERATORS_COLLECTION");
+    });
+
     function testConfigEnvironmentValue(configName: string) {
         process.env[configName] = "ENVIRONMENT";
         config = new Config();

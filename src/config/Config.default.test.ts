@@ -48,6 +48,10 @@ describe('Config', () => {
         testConfigDefaultValue("VERSION_COLLECTION","msmCurrentVersions");
     });
 
+    test('test VERSION_COLLECTION', () => {
+        testConfigDefaultValue("ENUMERATORS_COLLECTION","enumerators");
+    });
+
     function testConfigDefaultValue(configName: string, expectedValue: string) {
         config = new Config();
 

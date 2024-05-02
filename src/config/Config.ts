@@ -10,9 +10,9 @@ import { join } from 'path';
  *      and abstracts all file and mongodb i-o.
  */
 export default class Config {
-    private configItems: ConfigItem[] = [];
-    private versions: CollectionVersion[] = [];
-    private enumerators: any;
+    configItems: ConfigItem[] = [];
+    versions: CollectionVersion[] = [];
+    enumerators: any;
 
     private configFolder: string = "./";
     private port: IntegerType;
@@ -20,7 +20,8 @@ export default class Config {
     private dbName: string;
     private partnerCollectionName: string;
     private peopleCollectionName: string
-    private msmVersionCollection: string;
+    private versionCollectionName: string;
+    private enumeratorsCollectionName: string;
 
 
     /**
@@ -34,7 +35,8 @@ export default class Config {
         this.dbName = this.getConfigValue("DB_NAME", "mentorHub", false);
         this.partnerCollectionName = this.getConfigValue("PARTNER_COLLECTION", "partners", false);
         this.peopleCollectionName = this.getConfigValue("PEOPLE_COLLECTION", "people", false);
-        this.msmVersionCollection = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
+        this.versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
+        this.enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
 
         console.info("Configuration Initilized:", JSON.stringify(this.configItems));
     }
@@ -108,8 +110,12 @@ export default class Config {
         return this.peopleCollectionName;
     }
 
-    public getMsmVersionCollection(): string {
-        return this.msmVersionCollection;
+    public getVersionCollectionName(): string {
+        return this.versionCollectionName;
+    }
+
+    public getenumeratorsCollectionName(): string {
+        return this.enumeratorsCollectionName
     }
 
     public getConfigItems(): ConfigItem[] {

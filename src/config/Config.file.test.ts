@@ -37,6 +37,10 @@ describe('Config', () => {
         testConfigFileValue("VERSION_COLLECTION");
     });
 
+    test('test ENUMERATORS_COLLECTION', () => {
+        testConfigFileValue("ENUMERATORS_COLLECTION");
+    });
+
     function testConfigFileValue(configName: string) {
         const items = config.getConfigItems();
 
