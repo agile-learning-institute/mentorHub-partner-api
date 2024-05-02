@@ -12,7 +12,8 @@ import { join } from 'path';
 export default class Config {
     configItems: ConfigItem[] = [];
     versions: CollectionVersion[] = [];
-    enumerators: any;
+    enumerators: any = {};
+    apiVersion: string;
 
     private configFolder: string = "./";
     private port: IntegerType;
@@ -28,7 +29,7 @@ export default class Config {
      * Constructor gets configuration values, loads the enumerators, and logs completion
      */
     constructor() {
-        this.getConfigValue("BUILT_AT", "LOCAL", false);
+        this.apiVersion = "1.0." + this.getConfigValue("BUILT_AT", "LOCAL", false);
         this.configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
         this.port = parseInt(this.getConfigValue("PORT", "8084", false));
         this.connectionString = this.getConfigValue("CONNECTION_STRING", "mongodb://root:example@localhost:27017", true);
