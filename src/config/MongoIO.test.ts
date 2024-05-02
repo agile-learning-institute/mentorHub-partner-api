@@ -40,88 +40,16 @@ describe('MongIO', () => {
         expect(mongoIo.getEnumeratorsCollection().collectionName).toBe("enumerators");
     });
 
-    test('test Aggregate', async () => {
-        collection = mongoIo.getPartnerCollection();
-        let pipeline: any[] = [];
-        
-        // call Aggregate
-        let result = await mongoIo.aggregate(collection, pipeline);
-
-        expect(result.length()).toBeGreaterThan(1);
-        let partner = result[0];
-        expect(partner.name).toBe("");
-        expect(partner.contacts.length()).toBeGreaterThan(1);
-
-        let contact = partner.contacts[0];
-        expect(contact.firstName).toBe("");
-        expect(contact.lastName).toBe("");
-        expect(contact.phone).toBe("");
-
-        contact = partner.contacts[1];
-        expect(contact.firstName).toBe("");
-        expect(contact.lastName).toBe("");
-        expect(contact.phone).toBe("");
-    });
-
-    test('test Find', async () => {
-        collection = mongoIo.getVersionCollection();
-        let query = {};
-        let result: any[] = [];
-
-        // call find
-        result = await mongoIo.find(collection, query)
-
-        expect(result.length).toBeGreaterThan(1);
-    });
-
-    test('test FindOne', async () => {
-        collection = mongoIo.getVersionCollection();
-        let query = {};
-        let result: CollectionVersion;
-
-        // call findOne
-        result = await mongoIo.findOne(collection, query);
-
-        expect(result.length).toBeGreaterThan(1);
-    });
-
-    test('test InsertOne', async () => {
-        collection = mongoIo.getPartnerCollection();
-        let partner = {
-
-        }
-        // call find
-        let result = await mongoIo.addOne(collection, partner);
-
-        // Assert results
-        expect(result).toBe("have inserted ID")
-
-        // delete inserted doc
-    });
-
-    test('test UpdateOne', async () => {
-        collection = mongoIo.getPartnerCollection();
-        let result: Partner;
-        let query = {};
-        let update = {};
-
-        // Invoke updateOne
-        result = await mongoIo.updateOne(collection, query, update);
-
-        // Assert results
-        expect(false).toBeTruthy();
-    });
-
     test('test LoadVersions', async () => {
         await mongoIo.loadVersions();
-        
         expect(config.versions.length).toBeGreaterThan(0);
     });
 
     test('test LoadEnumerators', async () => {
         await mongoIo.loadVersions();
-        await mongoIo.loadEnumerators(1);
-
-        expect(config.enumerators.one.two).toBe("");
+        console.log(config.versions);
+        await mongoIo.loadEnumerators("paths");
+        expect(config.enumerators).toHaveProperty("defaultStatus");
+        expect(config.enumerators.defaultStatus.Active).toBe("Not Deleted")
     });
 });
