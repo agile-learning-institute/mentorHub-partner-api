@@ -9,7 +9,8 @@ export default class ConfigController {
   }
 
   public getConfig = async (req: Request, res: Response) => {
-    res.json({ message: 'Get Configurations' });
+    res.json(this.cfg);
+    res.status(200);
   };
   
 }
