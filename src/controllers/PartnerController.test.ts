@@ -21,11 +21,6 @@ const mockResponse = (): Partial<Response> => {
 
 const mockMongoIO = (): MongoInterface => {
   return {
-    aggregate: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    addOne: jest.fn(),
-    updateOne: jest.fn(),
     loadVersions: jest.fn(),
     loadEnumerators: jest.fn(),
     getPartnerCollection: jest.fn(),
