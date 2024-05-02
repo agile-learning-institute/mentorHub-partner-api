@@ -1,17 +1,19 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, Db, Collection, InsertOneResult, IntegerType} from 'mongodb';
 import { EJSON } from 'bson';
 import Config from './Config';
+import MongoInterface from '../interfaces/MongoInterface'
 
 /**
  * Class MongoIO implementes all mongodb I-O.
  */
-export default class MongoIO {
+export default class MongoIO  implements MongoInterface {
   private config: Config;
   private client?: MongoClient;
   private db?: Db;
   private peopleCollection?: Collection;
   private partnerCollection?: Collection;
   private versionCollection?: Collection;
+  private enumeratorsCollection?: Collection;
 
   /**
    * Constructor gets configuration values
@@ -34,7 +36,8 @@ export default class MongoIO {
     this.db = this.client.db(dbName);
     this.peopleCollection = this.db.collection(this.config.getPeopleCollectionName());
     this.partnerCollection = this.db.collection(this.config.getPartnerCollectionName());
-    this.versionCollection = this.db.collection(this.config.getMsmVersionCollection());
+    this.versionCollection = this.db.collection(this.config.getVersionCollectionName());
+    this.enumeratorsCollection = this.db.collection(this.config.getenumeratorsCollectionName());
 
     console.info("Database", dbName, "Connected");
   }
@@ -50,45 +53,55 @@ export default class MongoIO {
     }
   }
 
-  public async Aggregate(): Promise<void> {
+  public async aggregate(collection: Collection, pipeline: any[]): Promise<any> {
   }
 
-  public async Find(): Promise<void> {
+  public async find(collection: Collection, query: any): Promise<any[]> {
+    return [];
   }
 
-  public async FindOne(): Promise<void> {
+  public async findOne(collection: Collection, query: any): Promise<Document> {
+    return new Document();
   }
 
-  public async InsertOne(): Promise<void> {
+  public async addOne(collection: Collection, doc: any): Promise<any> {
   }
 
-  public async UpdateOne(): Promise<void> {
+  public async updateOne(collection: Collection, query: any, update: any): Promise<Document> {
+    return new Document();
   }
 
-  public async LoadVersions(): Promise<void> {
+  public async loadVersions(): Promise<void> {
   }
 
-  public async LoadEnumerators(): Promise<void> {
+  public async loadEnumerators(version: IntegerType): Promise<void> {
   }
 
-  public GetPartnerCollection(): Collection {
+  public getPartnerCollection(): Collection {
     if (!this.partnerCollection) {
       throw new Error("GetPartnerCollection - Database not connected");
     }
     return this.partnerCollection;
   }
 
-  public GetPeopleCollection(): Collection {
+  public getPeopleCollection(): Collection {
     if (!this.peopleCollection) {
       throw new Error("GetPeopleCollection - Database not connected");
     }
     return this.peopleCollection;
   }
 
-  public GetVersionCollection(): Collection {
+  public getVersionCollection(): Collection {
     if (!this.versionCollection) {
       throw new Error("GetVersionCollection - Database not connected");
     }
     return this.versionCollection;
+  }
+
+  public getEnumeratorsCollection(): Collection {
+    if (!this.enumeratorsCollection) {
+      throw new Error("getEnumeratorsCollection - Database not connected");
+    }
+    return this.enumeratorsCollection;
   }
 }

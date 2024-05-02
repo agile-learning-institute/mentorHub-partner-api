@@ -5,7 +5,9 @@
  */
 import MongoIO from './MongoIO';
 import Config from './Config';
-import { Collection, Db } from 'mongodb';
+import { Collection, Filter, Db } from 'mongodb';
+import { CollectionVersion } from '../interfaces/CollectionVersion';
+import { Partner } from '../interfaces/Partner';
 
 describe('MongIO', () => {
     let config: Config;
@@ -15,9 +17,7 @@ describe('MongIO', () => {
     beforeEach(async () => {
         config = new Config();
         mongoIo = new MongoIO(config);
-
         await mongoIo.connect();
-        collection = await mongoIo.GetPartnerCollection();
     });
 
     afterEach(async () => {
@@ -25,114 +25,103 @@ describe('MongIO', () => {
     });
 
     test('test GetPartnerCollection', () => {
-        expect(mongoIo.GetPartnerCollection().collectionName).toBe("partners");
+        expect(mongoIo.getPartnerCollection().collectionName).toBe("partners");
     });
 
     test('test GetPeopleCollection', () => {
-        expect(mongoIo.GetPeopleCollection().collectionName).toBe("people");
+        expect(mongoIo.getPeopleCollection().collectionName).toBe("people");
     });
 
     test('test GetPartnerCollection', () => {
-        expect(mongoIo.GetVersionCollection().collectionName).toBe("msmCurrentVersions");
+        expect(mongoIo.getVersionCollection().collectionName).toBe("msmCurrentVersions");
+    });
+
+    test('test GetPeopleCollection', () => {
+        expect(mongoIo.getEnumeratorsCollection().collectionName).toBe("enumerators");
     });
 
     test('test Aggregate', async () => {
-        // query {id:$oid{from test data}}
-        // Aggregate contacts to person._id
+        collection = mongoIo.getPartnerCollection();
+        let pipeline: any[] = [];
         
         // call Aggregate
-        await mongoIo.Aggregate();
+        let result = await mongoIo.aggregate(collection, pipeline);
 
-        // Assert results
-        // Assert contacts in results
-        // Assert contacts is array
-        // assert contacts[0].name, etc
-        expect(false).toBeTruthy();
+        expect(result.length()).toBeGreaterThan(1);
+        let partner = result[0];
+        expect(partner.name).toBe("");
+        expect(partner.contacts.length()).toBeGreaterThan(1);
+
+        let contact = partner.contacts[0];
+        expect(contact.firstName).toBe("");
+        expect(contact.lastName).toBe("");
+        expect(contact.phone).toBe("");
+
+        contact = partner.contacts[1];
+        expect(contact.firstName).toBe("");
+        expect(contact.lastName).toBe("");
+        expect(contact.phone).toBe("");
     });
 
     test('test Find', async () => {
-        // query project name, id
-        
-        // call find
-        await mongoIo.Find();
+        collection = mongoIo.getVersionCollection();
+        let query = {};
+        let result: any[] = [];
 
-        // Assert results
-        // Assert results len > 0
-        expect(false).toBeTruthy();
+        // call find
+        result = await mongoIo.find(collection, query)
+
+        expect(result.length).toBeGreaterThan(1);
     });
 
     test('test FindOne', async () => {
-        // query {id: from test data}
-        // update {description: }
-        
-        // call find
-        await mongoIo.FindOne();
+        collection = mongoIo.getVersionCollection();
+        let query = {};
+        let result: CollectionVersion;
 
-        // Assert description updated
-        expect(false).toBeTruthy();
+        // call findOne
+        result = await mongoIo.findOne(collection, query);
+
+        expect(result.length).toBeGreaterThan(1);
     });
 
     test('test InsertOne', async () => {
-        // setup query 
-        
+        collection = mongoIo.getPartnerCollection();
+        let partner = {
+
+        }
         // call find
-        await mongoIo.InsertOne();
+        let result = await mongoIo.addOne(collection, partner);
 
         // Assert results
-        expect(false).toBeTruthy();
+        expect(result).toBe("have inserted ID")
 
         // delete inserted doc
     });
 
     test('test UpdateOne', async () => {
-        // setup query 
-        // query id from test data
-        // update add id to contacts
-        
-        // call find
-        await mongoIo.UpdateOne();
+        collection = mongoIo.getPartnerCollection();
+        let result: Partner;
+        let query = {};
+        let update = {};
 
-        // Assert results
-        expect(false).toBeTruthy();
-    });
-
-    test('test Add-Remove Contact', async () => {
-        // setup query 
-        // query id from test data
-        // update add id to contacts
-        
-        // call find
-        await mongoIo.UpdateOne();
-
-        // Assert results
-        expect(false).toBeTruthy();
-
-        // update remove id to contacts
-        
-        // call find
-        await mongoIo.UpdateOne();
+        // Invoke updateOne
+        result = await mongoIo.updateOne(collection, query, update);
 
         // Assert results
         expect(false).toBeTruthy();
     });
 
     test('test LoadVersions', async () => {
-        // setup query 
+        await mongoIo.loadVersions();
         
-        // call find
-        await mongoIo.LoadVersions();
-
-        // Assert results
-        expect(false).toBeTruthy();
+        expect(config.versions.length).toBeGreaterThan(0);
     });
 
     test('test LoadEnumerators', async () => {
-        // setup query 
-        
-        // call find
-        await mongoIo.LoadEnumerators();
+        await mongoIo.loadVersions();
+        await mongoIo.loadEnumerators(1);
 
-        // Assert results
-        expect(false).toBeTruthy();
+        expect(config.enumerators.one.two).toBe("");
     });
 });
