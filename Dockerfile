@@ -4,7 +4,7 @@ FROM node:16 AS build
 # Install dependencies
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --production
+RUN npm install
 
 # Build server deployment 
 COPY . .
