@@ -11,6 +11,7 @@ export default class ConfigController {
   public getConfig = async (req: Request, res: Response) => {
     res.json(this.cfg);
     res.status(200);
+    console.info("GetConfig Completed");
   };
   
 }

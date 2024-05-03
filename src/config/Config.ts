@@ -1,5 +1,5 @@
-import { ConfigItem } from "../interfaces/ConfigItem";
-import { CollectionVersion } from "../interfaces/CollectionVersion";
+import ConfigItem from "../interfaces/ConfigItem";
+import CollectionVersion from "../interfaces/CollectionVersion";
 import { existsSync, readFileSync } from "fs";
 import { IntegerType } from "mongodb";
 import { join } from 'path';

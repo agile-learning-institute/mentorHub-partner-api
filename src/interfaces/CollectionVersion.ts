@@ -1,10 +1,7 @@
 import { ObjectId, WithId } from "mongodb";
 
-export interface CollectionVersionWithId extends CollectionVersion, WithId<CollectionVersion> {
+export default interface CollectionVersion extends Document, WithId<Document> {
   _id: ObjectId
-}
-
-export interface CollectionVersion extends Document {
   collectionName: string;
   currentVersion: string
 }

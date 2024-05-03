@@ -4,7 +4,7 @@
   "description": "This is repository contains the API for the Partner microservice. - This uses the [mentorhub-mongodb](https://github.com/agile-learning-institute/mentorHub-mongodb) project for a database with test data - This API supports the [mentorhub-partnerui](https://github.com/agile-learning-institute/mentorHub-partner-ui) front end.",
   "scripts": {
     "build": "tsc",
-    "prestart": "mh up mongodb",
+    "prestart": "tsc; mh up mongodb",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "precontainer": "docker build --tag ghcr.io/agile-learning-institute/mentorhub-partner-api:latest .",

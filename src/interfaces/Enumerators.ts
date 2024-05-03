@@ -1,10 +1,7 @@
 import { IntegerType, ObjectId, WithId } from "mongodb";
 
-export interface EnumeratorsWithId extends Enumerators, WithId<Enumerators> {
+export default interface Enumerators extends Document, WithId<Document> {
   _id: ObjectId
-}
-
-export interface Enumerators extends Document {
   name: string, 
   status: string,
   version: IntegerType,
