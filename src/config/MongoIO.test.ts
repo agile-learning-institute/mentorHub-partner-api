@@ -40,7 +40,7 @@ describe('MongIO', () => {
 
     test('test LoadVersions', async () => {
         await mongoIo.loadVersions();
-        expect(config.versions.length).toBeGreaterThan(0);
+        expect(config.versions.length).toBe(11);
     });
 
     test('test LoadEnumerators', async () => {
