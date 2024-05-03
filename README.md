@@ -1,30 +1,102 @@
-# <<TODO:domain>>-<<TODO:component>>
+# mentorhub-partner-api
 
-This is repository contains <<TODO:service-description>>
-
-[Here](https://github.com/orgs/agile-learning-institute/repositories?q=mentorhub-&type=all&sort=name) are all of the repositories in the [mentorHub](https://github.com/agile-learning-institute/mentorhub/tree/main) system
+This is repository contains the API for the Partner microservice.
+- This uses the [mentorhub-mongodb](https://github.com/agile-learning-institute/mentorHub-mongodb) project for a database with test data
+- This API supports the [mentorhub-partnerui](https://github.com/agile-learning-institute/mentorHub-partner-ui) front end.
 
 ## Prerequisites
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- TODO: Additional Prerequisites
+- [mentorHub Developers Edition](https://github.com/agile-learning-institute/mentorHub/tree/main/mentorHub-developer-edition)
+- [NodeJS](https://nodejs.org/en/download)
 
 ## Contributing
 
-Instructions on how to contribute, how to install dependencies and run locally. Including how to run backing services locally.
-
-## Build and test the container
-
-Use the following command to build and run the container locally. See [here for details](https://github.com/agile-learning-institute/mentorhub/blob/main/docker-compose/README.md) on how to stop/start the database.
-
+### Install dependencies
 ```bash
-../src/docker/docker-build.sh
+npm install
 ```
 
-After that command completes successfully you can verify it worked successfully by
+### Build Typescript for deployment
+```bash
+npm run build
+```
 
-- TODO: Describe functional baseline tests
+### Run the API locally
+```bash
+npm run start
+```
+NOTE: This will also start the backing database and initlize test data
 
-## Refactors and Enhancements
+### Build and Test the API container locally
+```bash
+npm run container
+```
+NOTE: This will also start the backing database and initlize test data
 
-- [ ] To Be Documented
+This will build the new container, and start the mongodb and API container ready for testing. 
+
+## API Testing with CURL
+If you want to do more manual testing, here are the curl commands to use
+
+### Test Health Endpoint
+
+This endpoint supports the promethius monitoring standards for a healthcheck endpoint
+
+```bash
+curl http://localhost:8084/api/health/
+
+```
+NOTE: Not Yet Functional
+
+### Test Config Endpoint
+
+```bash
+curl http://localhost:8084/api/config/
+```
+
+### Get Partner Names
+
+```bash
+curl http://localhost:8084/api/partner/
+```
+
+### Test get a partner
+
+```bash
+curl http://localhost:8084/api/partner/bbbb00000000000000000000
+```
+
+### Test add a partner
+
+```bash
+curl -X POST http://localhost:8084/api/partner/ \
+     -d '{"name":"Foo", "description":"Some short description"}'
+```
+
+### Test update a partner
+
+```bash
+curl -X PATCH http://localhost:8084/api/partner/bbbb00000000000000000000 \
+     -d '{"description":"Some long description"}'
+```
+
+### Test Add a contact to a partner
+
+```bash
+curl -X POST http://localhost:8084/api/partner/bbbb00000000000000000000/contact/AAAA00000000000000000000
+```
+
+### Test Remove a contct from a  partner
+
+```bash
+curl -X PATCH http://localhost:8084/api/partner/bbbb00000000000000000000contact/AAAA00000000000000000000
+```
+
+## Observability and Configuration
+
+The ```api/config/``` endpoint will return a list of configuration values. These values are either "defaults" or loaded from an Environment Variable, or found in a singleton configuration file of the same name. Configuration files take precidence over environment variables. The variable "CONFIG_FOLDER" will change the location of configuration files from the default of ```./```
+
+The ```api/health/``` endpoint is a Promethius Healthcheck endpoint.
+
+The [Dockerfile](./Dockerfile) uses a 2-stage build, and supports both amd64 and arm64 architectures. 
+
