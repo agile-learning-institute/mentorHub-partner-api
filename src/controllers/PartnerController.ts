@@ -1,7 +1,6 @@
 import ShortName from '../interfaces/ShortName'
 import MongoInterface from '../interfaces/MongoInterface';
 import { Request, Response } from 'express';
-import { FindOneAndUpdateOptions, InsertOneResult, ObjectId } from 'mongodb';
 import Partner from '../interfaces/Partner';
 import { Contact } from '../interfaces/Contact';
 
