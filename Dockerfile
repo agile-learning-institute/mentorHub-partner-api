@@ -31,8 +31,8 @@ WORKDIR /opt/app
 COPY --from=build /app/dist /opt/app
 COPY --from=build /app/node_modules /opt/app/node_modules
 
-# Set the working directory
-WORKDIR /opt/app
+# Use non-root user
+USER node
 
 # Run the processor
-ENTRYPOINT ["node", "server.js"]
+CMD ["node", "server.js"]
