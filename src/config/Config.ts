@@ -71,31 +71,6 @@ export default class Config {
         return value;
     }
 
-    /**
-     * Get the named enumerators object from the enumerators version specified
-     * 
-     * @param version 
-     * @param name 
-     * @returns enumerators object {"Value":"Description"}
-     */
-    public getEnums(version: number, name: string): any {
-        if (this.enumerators[version].version != version) {
-            throw new Error("Invalid Enumerators File bad version number sequence")
-        }
-        if (this.enumerators[version].enumerators.hasOwnProperty(name)) {
-            return this.enumerators[version].enumerators[name];
-        } else {
-            throw new Error("Enumerator does not exist:" + name);
-        }
-    }
-
-    /**
-     * Simple Setters
-     */
-    public setEnumerators(enums: any) {
-        this.enumerators = enums;
-    }
-
     /** 
      * Simple Getters
      */

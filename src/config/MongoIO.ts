@@ -238,14 +238,18 @@ export default class MongoIO implements MongoInterface {
       throw new Error("loadEnumerators - Versions not loaded");
     }
 
-    const theVersion = parseInt(this.config.versions
+    const theVersionString = this.config.versions
       .filter(version => version.collectionName === collectionName)
       .map(version => version.currentVersion.split('.').pop() || "0")
-      .pop() || "0");
+      .pop() || "0";
+    const theVersion = parseInt(theVersionString);
 
     let query = { "version": theVersion };
     let enumerations: Enumerators;
     enumerations = await this.enumeratorsCollection.findOne(query) as Enumerators;
+    if (!enumerations) {
+      throw new Error("Enumerators not found for version:" + collectionName + ":" + theVersionString );
+    }
     this.config.enumerators = enumerations.enumerators;
   }
 
