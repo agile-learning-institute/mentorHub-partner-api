@@ -5,8 +5,6 @@
  */
 import MongoIO from './MongoIO';
 import Config from './Config';
-import CollectionVersion from '../interfaces/CollectionVersion';
-import Partner from '../interfaces/Partner';
 import { Collection, Filter, Db } from 'mongodb';
 
 describe('MongIO', () => {

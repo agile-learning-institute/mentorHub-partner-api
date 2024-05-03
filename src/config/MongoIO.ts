@@ -1,5 +1,4 @@
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
-import { EJSON } from 'bson';
 import Config from './Config';
 import MongoInterface from '../interfaces/MongoInterface'
 import CollectionVersion from '../interfaces/CollectionVersion';

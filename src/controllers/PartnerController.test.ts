@@ -1,8 +1,6 @@
 /**
  * This set of unit tests test controller init from env
  */
-import Config from '../config/Config';
-import MongoIO from '../config/MongoIO';
 import MongoInterface from '../interfaces/MongoInterface';
 import Partner from '../interfaces/Partner';
 import PartnerController from './PartnerController';
