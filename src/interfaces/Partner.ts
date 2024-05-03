@@ -5,9 +5,9 @@ import { Contact } from "./Contact";
 export default interface Partner extends Document, WithId<Document>{
     _id: ObjectId
     name: string;
-    description?: string;
+    description: string;
     status?: string;
     url?: string;
-    contacts?: Contact[];
+    contactDetails?: Contact[];
     lastSaved?: Breadcrumb;
 }
