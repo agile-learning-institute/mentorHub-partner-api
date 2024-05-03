@@ -229,7 +229,7 @@ components:
           pattern: >-
             ^(https?:\/\/)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z-]{2,24}(:[0-9]{1,5})?(\/(([\w\-\.~]|%[a-fA-F0-9]{2}|[!\$&'\(\)\*\+,;=:@])*\/?)*)?
           type: string
-        contacts:
+        contactDetails:
           description: Array of People associated with this partner
           items:
             type: object
