@@ -13,10 +13,6 @@ describe('Config', () => {
         config = new Config();
     });
 
-    test('test CONNECTION_STRING', () => {
-        testConfigFileValue("CONNECTION_STRING");
-    });
-
     test('test DB_NAME', () => {
         testConfigFileValue("DB_NAME");
     });
@@ -42,7 +38,7 @@ describe('Config', () => {
     });
 
     function testConfigFileValue(configName: string) {
-        const items = config.getConfigItems();
+        const items = config.configItems;
 
         const item = items.find(i => i.name === configName);
         expect(item).toBeDefined();

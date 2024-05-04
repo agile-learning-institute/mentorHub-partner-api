@@ -28,10 +28,6 @@ describe('Config', () => {
         testConfigDefaultValue("CONFIG_FOLDER","/opt/mentorhub-partner-api");
     });
 
-    test('test CONNECTION_STRING', () => {
-        testConfigDefaultValue("CONNECTION_STRING","mongodb://root:example@localhost:27017");
-    });
-
     test('test DB_NAME', () => {
         testConfigDefaultValue("DB_NAME","mentorHub");
     });
@@ -55,7 +51,7 @@ describe('Config', () => {
     function testConfigDefaultValue(configName: string, expectedValue: string) {
         config = new Config();
 
-        const items = config.getConfigItems();
+        const items = config.configItems;
 
         const item = items.find(i => i.name === configName);
         expect(item).toBeDefined();

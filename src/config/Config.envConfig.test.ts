@@ -14,10 +14,6 @@ describe('Config', () => {
         testConfigEnvironmentValue("CONFIG_FOLDER");
     });
 
-    test('test CONNECTION_STRING', () => {
-        testConfigEnvironmentValue("CONNECTION_STRING");
-    });
-
     test('test DB_NAME', () => {
         testConfigEnvironmentValue("DB_NAME");
     });
@@ -47,7 +43,7 @@ describe('Config', () => {
         config = new Config();
         process.env[configName] = "";
 
-        const items = config.getConfigItems();
+        const items = config.configItems;
 
         const item = items.find(i => i.name === configName);
         expect(item).toBeDefined();
