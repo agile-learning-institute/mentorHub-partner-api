@@ -98,10 +98,6 @@ export default class Config {
         return this.enumeratorsCollectionName
     }
 
-    public getConfigItems(): ConfigItem[] {
-        return this.configItems;
-    }
-
     public getConfigFolder(): string {
         return this.configFolder;
     }
