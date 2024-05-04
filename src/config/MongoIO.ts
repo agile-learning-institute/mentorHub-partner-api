@@ -1,11 +1,11 @@
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
 import Config from './Config';
 import MongoInterface from '../interfaces/MongoInterface'
-import CollectionVersion from '../interfaces/CollectionVersion';
-import Enumerators from '../interfaces/Enumerators';
-import ShortName from '../interfaces/ShortName';
-import Partner from '../interfaces/Partner';
-import { Contact } from '../interfaces/Contact';
+import CollectionVersion from '../models/CollectionVersion';
+import Enumerators from '../models/Enumerators';
+import ShortName from '../models/ShortName';
+import Partner from '../models/Partner';
+import { Contact } from '../models/Contact';
 
 /**
  * Class MongoIO implementes all mongodb I-O.

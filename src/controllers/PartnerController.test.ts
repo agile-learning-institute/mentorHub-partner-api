@@ -2,7 +2,7 @@
  * This set of unit tests test controller init from env
  */
 import MongoInterface from '../interfaces/MongoInterface';
-import Partner from '../interfaces/Partner';
+import Partner from '../models/Partner';
 import PartnerController from './PartnerController';
 import { Request, Response } from 'express';
 

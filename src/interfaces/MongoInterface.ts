@@ -1,6 +1,6 @@
-import ShortName from './ShortName';
-import Partner from './Partner';
-import { Contact } from './Contact';
+import ShortName from '../models/ShortName';
+import Partner from '../models/Partner';
+import { Contact } from '../models/Contact';
 
 export default interface MongoInterface {
   connect(): Promise<void>
