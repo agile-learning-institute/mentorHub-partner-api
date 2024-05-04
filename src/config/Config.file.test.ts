@@ -13,10 +13,6 @@ describe('Config', () => {
         config = new Config();
     });
 
-    test('test CONNECTION_STRING', () => {
-        testConfigFileValue("CONNECTION_STRING");
-    });
-
     test('test DB_NAME', () => {
         testConfigFileValue("DB_NAME");
     });

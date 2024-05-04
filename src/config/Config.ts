@@ -1,14 +1,19 @@
-import ConfigItem from "../interfaces/ConfigItem";
-import CollectionVersion from "../models/CollectionVersion";
-import { existsSync, readFileSync } from "fs";
-import { IntegerType } from "mongodb";
-import { join } from 'path';
-
 /**
  * Class Config: This class manages configuration values 
  *      from the enviornment or configuration files, 
  *      and abstracts all file and mongodb i-o.
  */
+import CollectionVersion from "../models/CollectionVersion";
+import { existsSync, readFileSync } from "fs";
+import { IntegerType } from "mongodb";
+import { join } from 'path';
+
+interface ConfigItem {
+    name: string;
+    value: string;
+    from: string;
+}
+
 export default class Config {
     configItems: ConfigItem[] = [];
     versions: CollectionVersion[] = [];

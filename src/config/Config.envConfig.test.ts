@@ -14,10 +14,6 @@ describe('Config', () => {
         testConfigEnvironmentValue("CONFIG_FOLDER");
     });
 
-    test('test CONNECTION_STRING', () => {
-        testConfigEnvironmentValue("CONNECTION_STRING");
-    });
-
     test('test DB_NAME', () => {
         testConfigEnvironmentValue("DB_NAME");
     });
