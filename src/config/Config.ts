@@ -67,7 +67,11 @@ export default class Config {
             }
         }
 
-        this.configItems.push({ name, value, from });
+        this.configItems.push({ 
+            name: name, 
+            value: isSecret ? "secret" : value, 
+            from: from 
+        });
         return value;
     }
 
