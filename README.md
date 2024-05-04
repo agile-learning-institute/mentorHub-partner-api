@@ -9,6 +9,10 @@ This is repository contains the API for the Partner microservice.
 - [mentorHub Developers Edition](https://github.com/agile-learning-institute/mentorHub/tree/main/mentorHub-developer-edition)
 - [NodeJS](https://nodejs.org/en/download)
 
+### Optional
+- [Mongo Compass](https://www.mongodb.com/try/download/compass) to look into the database. See the [Dockerfile](./Dockerfile) for connection string detals.
+- [Postman](https://www.postman.com/downloads/) for Automated black-box Testing of the API
+
 ## Contributing
 
 ### Install dependencies
@@ -34,6 +38,9 @@ npm run container
 NOTE: This will also start the backing database and initlize test data
 
 This will build the new container, and start the mongodb and API container ready for testing. 
+
+## API Testing with Postman
+You can use postman to import the testing files found in the [test folder](./test/). These tests rely on our containrized database and test data. If it is not already running you should use ``mh up partner-api`` before running the tests. 
 
 ## API Testing with CURL
 If you want to do more manual testing, here are the curl commands to use
