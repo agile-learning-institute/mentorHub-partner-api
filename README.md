@@ -89,7 +89,7 @@ curl -X POST http://localhost:8084/api/partner/bbbb00000000000000000000/contact/
 ### Test Remove a contct from a  partner
 
 ```bash
-curl -X PATCH http://localhost:8084/api/partner/bbbb00000000000000000000contact/AAAA00000000000000000000
+curl -X DELETE http://localhost:8084/api/partner/bbbb00000000000000000000contact/AAAA00000000000000000000
 ```
 
 ## Observability and Configuration
