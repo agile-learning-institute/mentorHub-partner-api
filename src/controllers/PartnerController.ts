@@ -1,14 +1,13 @@
-import ShortName from '../interfaces/ShortName'
+import ShortName from '../models/ShortName'
 import MongoInterface from '../interfaces/MongoInterface';
 import { Request, Response } from 'express';
-import Partner from '../interfaces/Partner';
-import { Contact } from '../interfaces/Contact';
+import Partner from '../models/Partner';
+import { Contact } from '../models/Contact';
 
 export default class ConfigController {
-  mongo: MongoInterface;
 
-  constructor(mongoIO: MongoInterface) {
-    this.mongo = mongoIO;
+  constructor() {
+  
   }
 
   public getPartners = async (req: Request, res: Response) => {
