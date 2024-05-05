@@ -45,7 +45,8 @@ export default class ConfigController {
 
   public createPartner = async (req: Request, res: Response) => {
     try {
-      const newPartner = await this.mongo.insertPartner(req.body)
+      console.log("From partnerController createPartner", req.body);
+      const newPartner = await this.mongo.insertPartner(req.body);
       res.json(newPartner);
       res.status(200);
       console.info("AddPartner Completed for %s", newPartner._id);

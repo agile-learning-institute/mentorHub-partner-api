@@ -143,7 +143,7 @@ export default class MongoIO {
       throw new Error("addContact Contact Not Found " + personId);
     }
 
-    partner.contacts.push(contact._id);
+    partner.contacts.push(personObjectId);
     await partner.save();
     return contact;
   }

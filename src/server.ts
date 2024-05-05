@@ -24,9 +24,9 @@ export class Server {
         app.use(express.json());
 
         // Map routes to controllers
-        app.post('/api/partner/', (req, res) => partnerController.createPartner(req, res));
         app.get('/api/partner/', (req, res) => partnerController.getPartners(req, res));
         app.get('/api/partner/:partnerId', (req, res) => partnerController.getPartner(req, res));
+        app.post('/api/partner/', (req, res) => partnerController.createPartner(req, res));
         app.patch('/api/partner/:partnerId', (req, res) => partnerController.updatePartner(req, res));
         app.post('/api/partner/:partnerId/contact/:personId', (req, res) => partnerController.addContact(req, res));
         app.delete('/api/partner/:partnerId/contact/:personId', (req, res) => partnerController.removeContact(req, res));

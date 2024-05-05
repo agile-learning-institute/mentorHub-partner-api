@@ -70,6 +70,7 @@ curl http://localhost:8084/api/partner/bbbb00000000000000000000
 
 ```bash
 curl -X POST http://localhost:8084/api/partner/ \
+     -H "Content-Type: application/json" \
      -d '{"name":"Foo", "description":"Some short description"}'
 ```
 
@@ -77,6 +78,7 @@ curl -X POST http://localhost:8084/api/partner/ \
 
 ```bash
 curl -X PATCH http://localhost:8084/api/partner/bbbb00000000000000000000 \
+     -H "Content-Type: application/json" \
      -d '{"description":"Some long description"}'
 ```
 

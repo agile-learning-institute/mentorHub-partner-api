@@ -1,7 +1,7 @@
 import mongoose, { Document } from 'mongoose';
 import config from '../config/Config';
 
-const partnerCollectionName = config.getPartnerCollectionName(); 
+const partnerCollectionName = config.getPartnerCollectionName();
 
 interface Breadcrumb {
     fromIp: string;
@@ -24,7 +24,7 @@ export interface PartnerDoc extends Document {
     url?: string;
     contacts: mongoose.Types.ObjectId[];
     lastSaved?: Breadcrumb;
-    contactDetails?: Contact[]; 
+    contactDetails?: Contact[];
 }
 
 const BreadcrumbSchema = new mongoose.Schema<Breadcrumb>({
@@ -32,26 +32,28 @@ const BreadcrumbSchema = new mongoose.Schema<Breadcrumb>({
     byUser: { type: String },
     atTime: { type: String },
     correlationId: { type: String }
+}, {
+    _id: false
 });
 
 const PartnerSchema = new mongoose.Schema<PartnerDoc>({
-    name: { type: String, required: true },
+    name: { type: String },
     description: { type: String },
     status: { type: String },
     url: { type: String },
     contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }],
     lastSaved: { type: BreadcrumbSchema }
 }, {
-    collection: partnerCollectionName, 
-    toJSON: { virtuals: true },  
-    toObject: { virtuals: true } 
+    collection: partnerCollectionName,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 PartnerSchema.virtual('contactDetails', {
-    ref: 'Contact', 
+    ref: 'Contact',
     localField: 'contacts',
-    foreignField: '_id',  
-    justOne: false 
+    foreignField: '_id',
+    justOne: false
 });
 
 export const Partner = mongoose.model<PartnerDoc>(partnerCollectionName, PartnerSchema);

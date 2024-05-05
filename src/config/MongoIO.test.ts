@@ -63,7 +63,7 @@ describe('MongIO', () => {
         expect(output.name).toBe("Foo");
 
         const id = output._id;
-        await mongoIo.deletePartner(id);
+        // await mongoIo.deletePartner(id);
     });
 
     test('test updatePartner', async () => {
