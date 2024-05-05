@@ -1,25 +1,23 @@
 import express from 'express';
 import http from 'http';
-import Config from './config/Config'
+import config from './config/Config';
 import PartnerController from './controllers/PartnerController';
 import ConfigController from './controllers/ConfigController';
 import MongoIO from './config/MongoIO'
 
 export class Server {
-    private config: Config;
     private mongoIO: MongoIO;
     private server?: http.Server;
 
-    constructor(config: Config, mongoIO: MongoIO) {
-        this.config = config;
+    constructor(mongoIO: MongoIO) {
         this.mongoIO = mongoIO;
     }
 
     public async serve() {
 
         // Create controllers, inject dependencies
+        const configController = new ConfigController();
         const partnerController = new PartnerController(this.mongoIO);
-        const configController = new ConfigController(this.config);
 
         // Initilize express app
         const app = express();
@@ -35,7 +33,7 @@ export class Server {
         app.get('/api/config/', (req, res) => configController.getConfig(req, res));
 
         // Start Server
-        const port = this.config.getPort();
+        const port = config.getPort();
         this.server = app.listen(port, () => {
             console.log(`Server running on port ${port}`);
         });
@@ -65,11 +63,8 @@ export class Server {
 
 // Start the server
 (async () => {
-    const config = new Config();
-    const mongo = new MongoIO(config);
+    const mongo = new MongoIO();
     await mongo.connect();
-    await mongo.loadVersions();
-    await mongo.loadEnumerators(config.getPartnerCollectionName());
-    const server = new Server(config, mongo);
+    const server = new Server(mongo);
     await server.serve();
 })();
