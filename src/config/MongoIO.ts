@@ -1,256 +1,203 @@
-import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
-import Config from './Config';
-import MongoInterface from '../interfaces/MongoInterface'
-import CollectionVersion from '../interfaces/CollectionVersion';
-import Enumerators from '../interfaces/Enumerators';
+import mongoose from 'mongoose';
+import config from './Config';
+import { Partner, PartnerDoc } from '../models/PartnerModel';
+import { Contact, ContactDoc } from '../models/ContactModel';
+import { CollectionVersion, CollectionVersionDoc } from '../models/CollectionVersionModel';
+import { Enumerators } from '../models/EnumeratorsModel';
 import ShortName from '../interfaces/ShortName';
-import Partner from '../interfaces/Partner';
-import { Contact } from '../interfaces/Contact';
+import { highlightTrailingWhitespace } from 'jest-matcher-utils';
+import { ObjectId } from 'mongodb';
+import e from 'express';
 
 /**
  * Class MongoIO implementes all mongodb I-O.
  */
-export default class MongoIO implements MongoInterface {
-  private config: Config;
-  private client?: MongoClient;
-  private db?: Db;
-  private peopleCollection?: Collection;
-  private partnerCollection?: Collection;
-  private versionCollection?: Collection;
-  private enumeratorsCollection?: Collection;
+export default class MongoIO {
 
-  /**
-   * Constructor gets configuration values
-   */
-  constructor(config: Config) {
-    this.config = config;
+  constructor() {
   }
 
-  /**
-  * Connect to the Mongo Database, initilize
-  * connection related objects, and load versions 
-  * and enumerators
-  */
   public async connect(): Promise<void> {
-    const connectionString = this.config.getConnectionString();
-    const dbName = this.config.getDbName();
+    const connectionString = config.getConnectionString();
+    const dbName = config.getDbName();
 
-    this.client = new MongoClient(connectionString);
-    await this.client.connect();
-    this.db = this.client.db(dbName);
-    this.peopleCollection = this.db.collection(this.config.getPeopleCollectionName());
-    this.partnerCollection = this.db.collection(this.config.getPartnerCollectionName());
-    this.versionCollection = this.db.collection(this.config.getVersionCollectionName());
-    this.enumeratorsCollection = this.db.collection(this.config.getenumeratorsCollectionName());
+    await mongoose.connect(connectionString, {
+      dbName: dbName
+    });
 
-    console.info("Database", dbName, "Connected");
+    await this.loadVersions();
+    await this.loadEnumerators(config.getPartnerCollectionName());
+
+    console.info("Database", dbName, "connected via Mongoose");
+    console.info("Versions Loaded:", JSON.stringify(config.versions));
+    console.info("Enumerators Loaded:", JSON.stringify(config.enumerators));
+  }
+
+
+  public async disconnect(): Promise<void> {
+    const dbName = config.getDbName();
+    await mongoose.disconnect();
+    console.info("Database", dbName, "Disconnected via Mongoose");
   }
 
   /**
-   * Disconnect from the database
+   * Finds partners, excluding those with a status of "Archived".
+   * @returns An array of ShortName objects (only _id and name of partners).
    */
-  public async disconnect(): Promise<void> {
-    if (this.client) {
-      await this.client.close();
-      this.client = undefined;
-      this.db = undefined;
-    }
-  }
-
-  public getPartnerCollection(): Collection {
-    if (!this.partnerCollection) {
-      throw new Error("GetPartnerCollection - Database not connected");
-    }
-    return this.partnerCollection;
-  }
-
-  public getPeopleCollection(): Collection {
-    if (!this.peopleCollection) {
-      throw new Error("GetPeopleCollection - Database not connected");
-    }
-    return this.peopleCollection;
-  }
-
-  public getVersionCollection(): Collection {
-    if (!this.versionCollection) {
-      throw new Error("GetVersionCollection - Database not connected");
-    }
-    return this.versionCollection;
-  }
-
-  public getEnumeratorsCollection(): Collection {
-    if (!this.enumeratorsCollection) {
-      throw new Error("getEnumeratorsCollection - Database not connected");
-    }
-    return this.enumeratorsCollection;
-  }
-
   public async findPartners(): Promise<ShortName[]> {
-    if (!this.partnerCollection) {
-      throw new Error("findPartners database not connected");
-    }
-    const filter = { "status": { "$ne": "Archived" } };
-    const options = { projection: { _id: 1, name: 1 } };
-    let results: ShortName[];
-    results = await this.partnerCollection.find(filter, options).toArray() as ShortName[];
-    return results;
-  }
+    const PartnerModel = mongoose.model(config.getPartnerCollectionName());
 
-  public async findPartner(id: string): Promise<Partner> {
-    if (!this.partnerCollection) {
-      throw new Error("findPartners - Database not connected");
-    }
+    const filter = { status: { $ne: "Archived" } };
+    const projection = { _id: 1, name: 1 };
 
-    const partnerId = new ObjectId(id);
-    const pipeline = [
-      {
-        $match: { _id: partnerId }
-      },
-      {
-        $lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' }
-      },
-      {
-        $project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { firstName: '$$contact.firstName', lastName: '$$contact.lastName', phone: '$$contact.phone' } } } }
-      }
-    ];
-
-    let results: Partner | null;
-    results = await this.partnerCollection.aggregate<Partner>(pipeline).next();
-    if (results === null) {
-      throw new Error("Partner Not Found " + id);
-    } else {
+    try {
+      const results: ShortName[] = await PartnerModel.find(filter, projection).lean();
       return results;
+    } catch (error) {
+      console.error("findPartners failed:", error);
+      throw error;
     }
   }
 
-  public async insertPartner(thePartner: any): Promise<Partner> {
-    if (!this.partnerCollection) {
-      throw new Error("findPartners - Database not connected");
-    }
-    let results: InsertOneResult;
-    let newPartner: Partner;
+  /**
+   * Finds a single partner by ID and includes contact details.
+   * @param id - The partner's ID to find.
+   * @returns A Partner document with contact details included.
+   */
+  public async findPartner(id: string): Promise<PartnerDoc> {
+    const partnerId = new mongoose.Types.ObjectId(id);
 
-    results = await this.partnerCollection.insertOne(thePartner);
-    let id = results.insertedId.toHexString();
-    return await this.findPartner(id);
+    // Utilizing the Partner model to fetch the partner with populated contact details
+    const partner = await Partner.findById(partnerId)
+      .populate('contactDetails')  // Automatically resolving contact details using the virtual defined in the model
+      .exec();
+
+    if (!partner) {
+      throw new Error("Partner Not Found " + id);
+    }
+
+    return partner.toObject({ virtuals: true });  // Convert the Mongoose document to a plain object, including virtuals
   }
 
-  public async updatePartner(id: string, data: any): Promise<Partner> {
-    if (!this.partnerCollection) {
-      throw new Error("findPartners - Database not connected");
-    }
+  /**
+   * Inserts a new partner into the database.
+   * @param thePartner - The partner data to insert.
+   * @returns The newly created Partner document.
+   */
+  public async insertPartner(thePartner: any): Promise<PartnerDoc> {
+    const newPartner = new Partner(thePartner);
 
-    const partnerId = new ObjectId(id);
-    const filter = { _id: partnerId };
-    const update = { $set: data };
-    let thePartner: Partner;
+    await newPartner.save();
+    return await this.findPartner(newPartner._id.toString());
+  }
 
-    const result = await this.partnerCollection.findOneAndUpdate(filter, update);
-    if (!result) {
-      throw new Error("Update Partner found No Partner to Update " + partnerId);
+  /**
+   * Deletes new partner **ONLY FOR TESTING**
+   * @param theId - The partner ID to delete
+   */
+  public async deletePartner(id: ObjectId): Promise<void> {
+    await Partner.deleteOne({ _id: id });
+  }
+
+  /**
+   * Updates an existing partner in the database.
+   * @param id - The ID of the partner to update.
+   * @param data - The update data.
+   * @returns The updated Partner document.
+   */
+  public async updatePartner(id: string, data: any): Promise<PartnerDoc> {
+    const updatedPartner = await Partner.findByIdAndUpdate(
+      id,
+      { $set: data },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedPartner) {
+      throw new Error("Update Partner found No Partner to Update " + id);
     }
 
     return this.findPartner(id);
   }
 
-  public async addContact(partnerId: string, personId: string): Promise<Contact> {
-    if (!this.peopleCollection || !this.partnerCollection) {
-      throw new Error("addContact - Database not connected");
-    }
+  /**
+  * Adds a contact to a partner's contact list.
+  * @param partnerId - The ID of the partner to add the contact to.
+  * @param personId - The ID of the person to add as a contact.
+  * @returns The added Contact document.
+  */
+  public async addContact(partnerId: string, personId: string): Promise<ContactDoc> {
+    const partnerObjectId = new mongoose.Types.ObjectId(partnerId);
+    const personObjectId = new mongoose.Types.ObjectId(personId);
 
-    // Create OIDs
-    const partnerID = new ObjectId(partnerId);
-    const personID = new ObjectId(personId);
-
-    // Get the current contacts
-    let filter = { "_id": partnerID };
-    let partner = await this.partnerCollection.findOne(filter);
+    const partner = await Partner.findById(partnerObjectId);
     if (!partner) {
-      throw new Error("addContact Partner Not Found" + partnerId);
-    }
-    
-    // See if the contact already exists
-    if (partner.contacts) {      
-      const index = partner.contacts.findIndex((id: ObjectId) => id.equals(personID));
-      if (index != -1) {
-        throw new Error(`Add Contact ${personId} to partner ${partnerId} - already exists!.`);
-      }
+      throw new Error("addContact Partner Not Found " + partnerId);
     }
 
-    // Get the contact from people
-    filter = { "_id": personID };
-    let options = { projection: { _id: 1, firstName: 1, lastName: 1, phone: 1 } };
-    let theContact: Contact;
-    theContact = await this.peopleCollection.findOne(filter, options) as Contact;
-
-    // add the personId to contacts
-    filter = { "_id": partnerID };
-    let update = { $push: { "contacts": personID } } as any;
-    let result = await this.partnerCollection.findOneAndUpdate(filter, update);
-    if (!result) {
-      throw new Error("Add Contact Failed!")
-    } else {
-      return theContact;
+    if (partner.contacts.some(contactId => contactId.equals(personObjectId))) {
+      throw new Error("Add Contact failed: Contact already exists.");
     }
+
+    const contact: ContactDoc | null = await Contact.findById(personObjectId);
+    if (!contact) {
+      throw new Error("addContact Contact Not Found " + personId);
+    }
+
+    partner.contacts.push(contact._id);
+    await partner.save();
+    return contact;
   }
 
+  /**
+   * Removes a contact from a partner's contact list.
+   * @param partnerId - The ID of the partner from whom to remove the contact.
+   * @param personId - The ID of the contact to remove.
+   * @returns A promise resolved with void after the operation completes.
+   */
   public async removeContact(partnerId: string, personId: string): Promise<void> {
-    if (!this.partnerCollection) {
-      throw new Error("removeContact - Database not connected");
-    }
+    const partnerObjectId = new mongoose.Types.ObjectId(partnerId);
+    const personObjectId = new mongoose.Types.ObjectId(personId);
 
-    // Get the current contacts
-    const partnerID = new ObjectId(partnerId);
-    const personID = new ObjectId(personId);
-    let filter = { "_id": partnerID };
-    let partner = await this.partnerCollection.findOne(filter);
-    if (!partner || !partner.contacts) {
-      throw new Error("removeContact Partner Not Found or no contacts array: " + partnerId);
-    }
+    const result = await Partner.findByIdAndUpdate(
+      partnerObjectId,
+      { $pull: { contacts: personObjectId } },
+      { new: true }
+    );
 
-    // Remove the contact from the list
-    const index = partner.contacts.findIndex((id: ObjectId) => id.equals(personID));
-    if (index === -1) {
-      throw new Error(`Remove Contact ${personId} not found in partner ${partnerId}.`);
+    if (!result) {
+      throw new Error("Remove Contact failed: Partner not found or contact not in list.");
     }
-    partner.contacts.splice(index, 1);
-
-    // Update the partner contact list
-    const update = { $set: { contacts: partner.contacts } };
-    const result = await this.partnerCollection.findOneAndUpdate(filter, update);
-    return;
   }
 
+  /**
+   * Loads all collection versions from the database and stores them in the config.
+   */
   public async loadVersions(): Promise<void> {
-    if (!this.versionCollection) {
-      throw new Error("loadVersions - Database not connected");
-    }
-    let versions: CollectionVersion[];
-    versions = await this.versionCollection.find({}).toArray() as Array<CollectionVersion>;
-    this.config.versions = versions;
+    const versions = await CollectionVersion.find({}).exec();
+    config.versions = versions;
   }
 
+  /**
+   * Loads the enumerators for a specific collection based on the latest version.
+   * @param collectionName The name of the collection for which to load enumerators.
+   */
   public async loadEnumerators(collectionName: string): Promise<void> {
-    if (!this.enumeratorsCollection) {
-      throw new Error("loadEnumerators - Database not connected");
-    }
-    if (this.config.versions.length === 0) {
+    if (config.versions.length === 0) {
       throw new Error("loadEnumerators - Versions not loaded");
     }
 
-    const theVersionString = this.config.versions
-      .filter(version => version.collectionName === collectionName)
+    const theVersionString = config.versions
+      .filter((version: CollectionVersionDoc) => version.collectionName === collectionName)
       .map(version => version.currentVersion.split('.').pop() || "0")
       .pop() || "0";
     const theVersion = parseInt(theVersionString);
 
-    let query = { "version": theVersion };
-    let enumerations: Enumerators;
-    enumerations = await this.enumeratorsCollection.findOne(query) as Enumerators;
+    const enumerations = await Enumerators.findOne({ version: theVersion }).exec();
     if (!enumerations) {
-      throw new Error("Enumerators not found for version:" + collectionName + ":" + theVersionString );
+      throw new Error("Enumerators not found for version:" + collectionName + ":" + theVersionString);
     }
-    this.config.enumerators = enumerations.enumerators;
+
+    config.enumerators = enumerations.enumerators;
   }
 
 }
