@@ -52,7 +52,7 @@ export class Config {
         this.versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
         this.enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
 
-        console.info("Configuration Initilized");
+        console.info("Configuration Initilized", JSON.stringify(this));        
     }
 
     /**
