@@ -1,34 +1,47 @@
-import ConfigItem from "../interfaces/ConfigItem";
-import CollectionVersion from "../interfaces/CollectionVersion";
-import { existsSync, readFileSync } from "fs";
-import { IntegerType } from "mongodb";
-import { join } from 'path';
-
 /**
  * Class Config: This class manages configuration values 
  *      from the enviornment or configuration files, 
  *      and abstracts all file and mongodb i-o.
  */
-export default class Config {
+import { CollectionVersionDoc } from "../models/CollectionVersionModel"
+import { existsSync, readFileSync } from "fs";
+import { join } from 'path';
+
+interface ConfigItem {
+    name: string;
+    value: string;
+    from: string;
+}
+
+export class Config {
+    private static instance: Config; // Singleton 
+
     configItems: ConfigItem[] = [];
-    versions: CollectionVersion[] = [];
+    versions: CollectionVersionDoc[] = [];
     enumerators: any = {};
-    apiVersion: string;
+    apiVersion: string = "";
 
     private configFolder: string = "./";
-    private port: IntegerType;
-    private connectionString: string;
-    private dbName: string;
-    private partnerCollectionName: string;
-    private peopleCollectionName: string
-    private versionCollectionName: string;
-    private enumeratorsCollectionName: string;
+    private port: number = 8084;
+    private connectionString: string = "";
+    private dbName: string = "";
+    private partnerCollectionName: string = "";
+    private peopleCollectionName: string = "";
+    private versionCollectionName: string = "";
+    private enumeratorsCollectionName: string = "";
 
 
     /**
      * Constructor gets configuration values, loads the enumerators, and logs completion
      */
     constructor() {
+        this.initialize();
+    }
+
+    public initialize() {
+        this.configItems = [];
+        this.versions = [];
+        this.enumerators = {};
         this.apiVersion = "1.0." + this.getConfigValue("BUILT_AT", "LOCAL", false);
         this.configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
         this.port = parseInt(this.getConfigValue("PORT", "8084", false));
@@ -39,7 +52,7 @@ export default class Config {
         this.versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
         this.enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
 
-        console.info("Configuration Initilized:", JSON.stringify(this.configItems));
+        console.info("Configuration Initilized");
     }
 
     /**
@@ -67,18 +80,28 @@ export default class Config {
             }
         }
 
-        this.configItems.push({ 
-            name: name, 
-            value: isSecret ? "secret" : value, 
-            from: from 
+        this.configItems.push({
+            name: name,
+            value: isSecret ? "secret" : value,
+            from: from
         });
         return value;
+    }
+
+    /**
+     * Singleton Constructor
+     */
+    public static getInstance(): Config {
+        if (!Config.instance) {
+            Config.instance = new Config();
+        }
+        return Config.instance;
     }
 
     /** 
      * Simple Getters
      */
-    public getPort(): IntegerType {
+    public getPort(): number {
         return this.port;
     }
 
@@ -110,3 +133,7 @@ export default class Config {
         return this.dbName
     }
 }
+
+// Create a singleton instance of Config and export it
+const config = Config.getInstance();
+export default config;

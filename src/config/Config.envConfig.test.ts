@@ -1,10 +1,9 @@
 /**
  * This set of unit tests test config init from env
  */
-import Config from './Config';
+import config, { Config } from './Config';
 
 describe('Config', () => {
-    let config: Config;
 
     test('test BUILT_AT', () => {
         testConfigEnvironmentValue("BUILT_AT");
@@ -40,7 +39,7 @@ describe('Config', () => {
 
     function testConfigEnvironmentValue(configName: string) {
         process.env[configName] = "ENVIRONMENT";
-        config = new Config();
+        config.initialize();
         process.env[configName] = "";
 
         const items = config.configItems;

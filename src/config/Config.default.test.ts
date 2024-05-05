@@ -1,18 +1,15 @@
 /**
  * This set of unit tests test config init from env
  */
-import Config from './Config';
+import config, { Config } from './Config';
 
 describe('Config', () => {
-    let config: Config;
 
     test('test default properties in getters', () => {
-        config = new Config();
         expect(config.getConfigFolder()).toBe("/opt/mentorhub-partner-api");
     });
 
     test('test getPort', () => {
-        config = new Config();
         expect(config.getPort()).toEqual(8084);
     });
 
@@ -49,8 +46,6 @@ describe('Config', () => {
     });
 
     function testConfigDefaultValue(configName: string, expectedValue: string) {
-        config = new Config();
-
         const items = config.configItems;
 
         const item = items.find(i => i.name === configName);

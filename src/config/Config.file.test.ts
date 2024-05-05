@@ -2,15 +2,15 @@
  * This set of unit tests test config init from files
  * and uses the files in /test/configTest
  */
-import Config from './Config';
+import config, { Config } from './Config';
 
 describe('Config', () => {
-    let config: Config;
 
     // Clear all mocks before each test
     beforeEach(() => {
         process.env.CONFIG_FOLDER = "./test/configTest";
-        config = new Config();
+        config.initialize();
+        process.env.CONFIG_FOLDER = "";
     });
 
     test('test DB_NAME', () => {
