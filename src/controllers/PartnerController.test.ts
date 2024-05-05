@@ -2,7 +2,7 @@
  * This set of unit tests test controller init from env
  */
 import MongoInterface from '../interfaces/MongoInterface';
-import Partner from '../interfaces/Partner';
+import { PartnerDoc} from '../models/PartnerModel';
 import PartnerController from './PartnerController';
 import { Request, Response } from 'express';
 
@@ -76,7 +76,7 @@ describe('PartnerController', () => {
     const data = { name: 'A New Partner' };
     const req = mockRequest({});
     const res = mockResponse();
-    let thePartner: Partner;
+    let thePartner: PartnerDoc;
 
     (partnerController.mongo.insertPartner as jest.Mock).mockResolvedValue(data);
     await partnerController.createPartner(req as Request, res as Response);

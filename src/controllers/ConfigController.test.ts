@@ -1,4 +1,4 @@
-import Config from '../config/Config';
+import config from '../config/Config';
 import ConfigController from './ConfigController';
 import { Request, Response } from 'express';
 
@@ -15,14 +15,12 @@ const mockResponse = (): Partial<Response> & { json: jest.Mock } => {
 };
 
 describe('ConfigController', () => {
-  let cfg: Config;
   let cfgController: ConfigController;
   let req: Partial<Request>;
   let res: Partial<Response>;
 
   beforeEach(() => {
-    cfg = new Config();
-    cfgController = new ConfigController(cfg);
+    cfgController = new ConfigController();
     req = {};
     res = mockResponse();
   });
