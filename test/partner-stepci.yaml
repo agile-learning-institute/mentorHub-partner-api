@@ -57,6 +57,8 @@ tests:
                     type: string
                   phone:
                     type: string
+                  email:
+                    type: string
   partner:
     name: Test /api/partner endpoints
     steps:
