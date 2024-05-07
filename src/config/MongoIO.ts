@@ -69,7 +69,11 @@ export default class MongoIO {
 
     // Utilizing the Partner model to fetch the partner with populated contact details
     const partner = await Partner.findById(partnerId)
-      .populate('contactDetails')  // Automatically resolving contact details using the virtual defined in the model
+      .populate({
+        path: 'contactDetails',
+        select: 'firstName lastName phone'
+      })  
+      .select('-contacts')
       .exec();
 
     if (!partner) {

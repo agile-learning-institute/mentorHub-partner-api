@@ -46,7 +46,8 @@ const PartnerSchema = new mongoose.Schema<PartnerDoc>({
 }, {
     collection: partnerCollectionName,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    id: false
 });
 
 PartnerSchema.virtual('contactDetails', {

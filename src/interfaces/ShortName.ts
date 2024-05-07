@@ -1,6 +1,6 @@
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId } from "mongodb";
 
-export default interface ShortName extends Document, WithId<Document> {
+export default interface ShortName {
     _id: ObjectId;
     name: string;
 }

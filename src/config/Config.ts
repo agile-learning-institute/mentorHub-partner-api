@@ -21,14 +21,14 @@ export class Config {
     enumerators: any = {};
     apiVersion: string = "";
 
-    private configFolder: string = "./";
-    private port: number = 8084;
-    private connectionString: string = "";
-    private dbName: string = "";
-    private partnerCollectionName: string = "";
-    private peopleCollectionName: string = "";
-    private versionCollectionName: string = "";
-    private enumeratorsCollectionName: string = "";
+    #configFolder: string = "./";
+    #port: number = 8084;
+    #connectionString: string = "";
+    #dbName: string = "";
+    #partnerCollectionName: string = "";
+    #peopleCollectionName: string = "";
+    #versionCollectionName: string = "";
+    #enumeratorsCollectionName: string = "";
 
 
     /**
@@ -43,14 +43,14 @@ export class Config {
         this.versions = [];
         this.enumerators = {};
         this.apiVersion = "1.0." + this.getConfigValue("BUILT_AT", "LOCAL", false);
-        this.configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
-        this.port = parseInt(this.getConfigValue("PORT", "8084", false));
-        this.connectionString = this.getConfigValue("CONNECTION_STRING", "mongodb://root:example@localhost:27017", true);
-        this.dbName = this.getConfigValue("DB_NAME", "mentorHub", false);
-        this.partnerCollectionName = this.getConfigValue("PARTNER_COLLECTION", "partners", false);
-        this.peopleCollectionName = this.getConfigValue("PEOPLE_COLLECTION", "people", false);
-        this.versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
-        this.enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
+        this.#configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
+        this.#port = parseInt(this.getConfigValue("PORT", "8084", false));
+        this.#connectionString = this.getConfigValue("CONNECTION_STRING", "mongodb://root:example@localhost:27017", true);
+        this.#dbName = this.getConfigValue("DB_NAME", "mentorHub", false);
+        this.#partnerCollectionName = this.getConfigValue("PARTNER_COLLECTION", "partners", false);
+        this.#peopleCollectionName = this.getConfigValue("PEOPLE_COLLECTION", "people", false);
+        this.#versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
+        this.#enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
 
         console.info("Configuration Initilized", JSON.stringify(this));        
     }
@@ -73,7 +73,7 @@ export class Config {
         if (process.env[name]) {
             from = 'environment';
         } else {
-            const filePath = join(this.configFolder, name);
+            const filePath = join(this.#configFolder, name);
             if (existsSync(filePath)) {
                 value = readFileSync(filePath, 'utf-8').trim();
                 from = 'file';
@@ -102,35 +102,35 @@ export class Config {
      * Simple Getters
      */
     public getPort(): number {
-        return this.port;
+        return this.#port;
     }
 
     public getPartnerCollectionName(): string {
-        return this.partnerCollectionName;
+        return this.#partnerCollectionName;
     }
 
     public getPeopleCollectionName(): string {
-        return this.peopleCollectionName;
+        return this.#peopleCollectionName;
     }
 
     public getVersionCollectionName(): string {
-        return this.versionCollectionName;
+        return this.#versionCollectionName;
     }
 
     public getenumeratorsCollectionName(): string {
-        return this.enumeratorsCollectionName
+        return this.#enumeratorsCollectionName
     }
 
     public getConfigFolder(): string {
-        return this.configFolder;
+        return this.#configFolder;
     }
 
     public getConnectionString(): string {
-        return this.connectionString;
+        return this.#connectionString;
     }
 
     public getDbName(): string {
-        return this.dbName
+        return this.#dbName
     }
 }
 
