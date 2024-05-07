@@ -1,20 +1,27 @@
-import ConfigItem from "../interfaces/ConfigItem";
+/**
+ * Class Config: This class manages configuration values 
+ *      from the enviornment or configuration files, 
+ *      and provides all data for the /config endpoint
+ */
+
 import CollectionVersion from "../interfaces/CollectionVersion";
 import { existsSync, readFileSync } from "fs";
 import { IntegerType } from "mongodb";
 import { join } from 'path';
 
-/**
- * Class Config: This class manages configuration values 
- *      from the enviornment or configuration files, 
- *      and abstracts all file and mongodb i-o.
- */
+interface ConfigItem {
+    name: string;
+    value: string;
+    from: string;
+}
+
 export default class Config {
     configItems: ConfigItem[] = [];
     versions: CollectionVersion[] = [];
     enumerators: any = {};
     apiVersion: string;
 
+    // Private Properties
     #configFolder: string = "./";
     #port: IntegerType;
     #connectionString: string;
