@@ -1,12 +1,10 @@
 /**
  * Class Config: This class manages configuration values 
  *      from the enviornment or configuration files, 
- *      and provides all data for the /config endpoint
+ *      and abstracts all file and mongodb i-o.
  */
-
-import CollectionVersion from "../interfaces/CollectionVersion";
+import { CollectionVersionDoc } from "../models/CollectionVersionModel"
 import { existsSync, readFileSync } from "fs";
-import { IntegerType } from "mongodb";
 import { join } from 'path';
 
 interface ConfigItem {
@@ -15,23 +13,22 @@ interface ConfigItem {
     from: string;
 }
 
-export  class Config {
+export class Config {
     private static instance: Config; // Singleton 
 
     configItems: ConfigItem[] = [];
-    versions: CollectionVersion[] = [];
+    versions: CollectionVersionDoc[] = [];
     enumerators: any = {};
-    apiVersion: string;
+    apiVersion: string = "";
 
-    // Private Properties
     #configFolder: string = "./";
-    #port: IntegerType;
-    #connectionString: string;
-    #dbName: string;
-    #partnerCollectionName: string;
-    #peopleCollectionName: string
-    #versionCollectionName: string;
-    #enumeratorsCollectionName: string;
+    #port: number = 8084;
+    #connectionString: string = "";
+    #dbName: string = "";
+    #partnerCollectionName: string = "";
+    #peopleCollectionName: string = "";
+    #versionCollectionName: string = "";
+    #enumeratorsCollectionName: string = "";
 
 
     /**
@@ -41,7 +38,10 @@ export  class Config {
         this.initialize();
     }
 
-    public initialize() {        
+    public initialize() {
+        this.configItems = [];
+        this.versions = [];
+        this.enumerators = {};
         this.apiVersion = "1.0." + this.getConfigValue("BUILT_AT", "LOCAL", false);
         this.#configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
         this.#port = parseInt(this.getConfigValue("PORT", "8084", false));
@@ -52,7 +52,7 @@ export  class Config {
         this.#versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
         this.#enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
 
-        console.info("Configuration Initilized:", JSON.stringify(this.configItems));
+        console.info("Configuration Initilized", JSON.stringify(this));        
     }
 
     /**
@@ -80,10 +80,10 @@ export  class Config {
             }
         }
 
-        this.configItems.push({ 
-            name: name, 
-            value: isSecret ? "secret" : value, 
-            from: from 
+        this.configItems.push({
+            name: name,
+            value: isSecret ? "secret" : value,
+            from: from
         });
         return value;
     }
@@ -101,7 +101,7 @@ export  class Config {
     /** 
      * Simple Getters
      */
-    public getPort(): IntegerType {
+    public getPort(): number {
         return this.#port;
     }
 
