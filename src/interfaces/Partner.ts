@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import { Document, ObjectId, WithId } from "mongodb";
 import { Breadcrumb } from "./Breadcrumb";
 import { Contact } from "./Contact";
 
