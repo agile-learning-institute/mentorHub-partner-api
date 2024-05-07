@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import { Document, ObjectId, WithId } from "mongodb";
 
 export interface Contact extends Document, WithId<Document> {
     _id: ObjectId;
