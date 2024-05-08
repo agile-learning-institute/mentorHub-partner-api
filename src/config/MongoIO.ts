@@ -1,14 +1,17 @@
+/**
+ * Class MongoIO implementes all mongodb I-O.
+ */
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
 import config from './Config';
 import MongoInterface from '../interfaces/MongoInterface'
 import CollectionVersion from '../interfaces/CollectionVersion';
 import Enumerators from '../interfaces/Enumerators';
-import ShortName from '../interfaces/ShortName';
 import Partner from '../interfaces/Partner';
 import { Contact } from '../interfaces/Contact';
 
+
 /**
- * Class MongoIO implementes all mongodb I-O.
+ * Class Properties
  */
 export default class MongoIO implements MongoInterface {
   private client?: MongoClient;
@@ -55,34 +58,10 @@ export default class MongoIO implements MongoInterface {
     }
   }
 
-  public getPartnerCollection(): Collection {
-    if (!this.partnerCollection) {
-      throw new Error("GetPartnerCollection - Database not connected");
-    }
-    return this.partnerCollection;
-  }
-
-  public getPeopleCollection(): Collection {
-    if (!this.peopleCollection) {
-      throw new Error("GetPeopleCollection - Database not connected");
-    }
-    return this.peopleCollection;
-  }
-
-  public getVersionCollection(): Collection {
-    if (!this.versionCollection) {
-      throw new Error("GetVersionCollection - Database not connected");
-    }
-    return this.versionCollection;
-  }
-
-  public getEnumeratorsCollection(): Collection {
-    if (!this.enumeratorsCollection) {
-      throw new Error("getEnumeratorsCollection - Database not connected");
-    }
-    return this.enumeratorsCollection;
-  }
-
+  /**
+   * Get a list of people
+   * @returns Contacts
+   */
   public async findPeople(): Promise<Contact[]> {
     if (!this.peopleCollection) {
       throw new Error("findPeople database not connected");
@@ -94,17 +73,26 @@ export default class MongoIO implements MongoInterface {
     return results;
   }
 
-  public async findPartners(): Promise<ShortName[]> {
+  /**
+   * Get a list of all Partners
+   * @returns Partner[]
+   */
+  public async findPartners(): Promise<Partner[]> {
     if (!this.partnerCollection) {
       throw new Error("findPartners database not connected");
     }
     const filter = { "status": { "$ne": "Archived" } };
     const options = { projection: { _id: 1, name: 1 } };
-    let results: ShortName[];
-    results = await this.partnerCollection.find(filter, options).toArray() as ShortName[];
+    let results: Partner[];
+    results = await this.partnerCollection.find(filter, options).toArray() as Partner[];
     return results;
   }
 
+  /**
+   * Get a Partner by ID
+   * @param id 
+   * @returns Partner
+   */
   public async findPartner(id: string): Promise<Partner> {
     if (!this.partnerCollection) {
       throw new Error("findPartners - Database not connected");
@@ -112,15 +100,9 @@ export default class MongoIO implements MongoInterface {
 
     const partnerId = new ObjectId(id);
     const pipeline = [
-      {
-        $match: { _id: partnerId }
-      },
-      {
-        $lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' }
-      },
-      {
-        $project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } }
-      }
+      {$match: { _id: partnerId }},
+      {$lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' }},
+      {$project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } }}
     ];
 
     let results: Partner | null;
@@ -132,6 +114,11 @@ export default class MongoIO implements MongoInterface {
     }
   }
 
+  /**
+   * Insert a new Partner
+   * @param thePartner 
+   * @returns Inserted Values
+   */
   public async insertPartner(thePartner: any): Promise<Partner> {
     if (!this.partnerCollection) {
       throw new Error("findPartners - Database not connected");
@@ -144,6 +131,12 @@ export default class MongoIO implements MongoInterface {
     return await this.findPartner(id);
   }
 
+  /**
+   * Update a partner by ID
+   * @param id 
+   * @param data to update
+   * @returns Updated Partner
+   */
   public async updatePartner(id: string, data: any): Promise<Partner> {
     if (!this.partnerCollection) {
       throw new Error("findPartners - Database not connected");
@@ -162,6 +155,12 @@ export default class MongoIO implements MongoInterface {
     return this.findPartner(id);
   }
 
+  /**
+   * Add a contact to a partner
+   * @param partnerId 
+   * @param personId 
+   * @returns Contact for PersonID
+   */
   public async addContact(partnerId: string, personId: string): Promise<Contact> {
     if (!this.peopleCollection || !this.partnerCollection) {
       throw new Error("addContact - Database not connected");
@@ -206,6 +205,12 @@ export default class MongoIO implements MongoInterface {
     }
   }
 
+  /**
+   * Remove a contact from a partner
+   * @param partnerId 
+   * @param personId 
+   * @returns {}
+   */
   public async removeContact(partnerId: string, personId: string): Promise<void> {
     if (!this.partnerCollection) {
       throw new Error("removeContact - Database not connected");
@@ -233,6 +238,9 @@ export default class MongoIO implements MongoInterface {
     return;
   }
 
+  /**
+   * Load the collection Versions array
+   */
   public async loadVersions(): Promise<void> {
     if (!this.versionCollection) {
       throw new Error("loadVersions - Database not connected");
@@ -242,6 +250,10 @@ export default class MongoIO implements MongoInterface {
     config.versions = versions;
   }
 
+  /**
+   * Load the Enumerators based on a Collection Version
+   * @param collectionName of the collection to use
+   */
   public async loadEnumerators(collectionName: string): Promise<void> {
     if (!this.enumeratorsCollection) {
       throw new Error("loadEnumerators - Database not connected");

@@ -21,22 +21,6 @@ describe('MongIO', () => {
         await mongoIo.disconnect()
     });
 
-    test('test GetPartnerCollection', () => {
-        expect(mongoIo.getPartnerCollection().collectionName).toBe("partners");
-    });
-
-    test('test GetPeopleCollection', () => {
-        expect(mongoIo.getPeopleCollection().collectionName).toBe("people");
-    });
-
-    test('test GetPartnerCollection', () => {
-        expect(mongoIo.getVersionCollection().collectionName).toBe("msmCurrentVersions");
-    });
-
-    test('test GetPeopleCollection', () => {
-        expect(mongoIo.getEnumeratorsCollection().collectionName).toBe("enumerators");
-    });
-
     test('test LoadVersions', async () => {
         await mongoIo.loadVersions();
         expect(config.versions.length).toBe(11);
@@ -92,7 +76,7 @@ describe('MongIO', () => {
         expect(output.name).toBe("Foo");
 
         const id = output._id;
-        await mongoIo.getPartnerCollection().findOneAndDelete({ _id: id });
+        // await mongoIo.getPartnerCollection().findOneAndDelete({ _id: id });
     });
 
     test('test updatePartner', async () => {

@@ -1,4 +1,3 @@
-import ShortName from './ShortName';
 import Partner from './Partner';
 import { Contact } from './Contact';
 
@@ -6,7 +5,7 @@ export default interface MongoInterface {
   connect(): Promise<void>
   disconnect(): Promise<void>;
   findPeople(): Promise<Contact[]>;
-  findPartners(): Promise<ShortName[]>;
+  findPartners(): Promise<Partner[]>;
   findPartner(id: string): Promise<Partner>;
   insertPartner(thePartner: Partner): Promise<Partner>;
   updatePartner(id: string, data: any): Promise<Partner>;
