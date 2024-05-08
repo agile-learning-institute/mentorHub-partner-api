@@ -57,8 +57,15 @@ tests:
                     type: string
                   phone:
                     type: string
-                  email:
+                  eMail:
                     type: string
+                required:
+                  - _id
+                  - firstName
+                  - lastName
+                  - phone
+                  - eMail
+                additionalProperties: false
   partner:
     name: Test /api/partner endpoints
     steps:
@@ -80,7 +87,7 @@ tests:
                 required:
                   - _id
                   - name
-                additionalProperties: false              
+                additionalProperties: false
       - name: GET a single partner
         http:
           url: http://${{env.host}}/api/partner/bbbb00000000000000000001

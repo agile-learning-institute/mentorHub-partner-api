@@ -4,5 +4,6 @@ export interface Contact extends Document, WithId<Document> {
     _id: ObjectId;
     firstName: string;
     lastName: string;
+    eMail: string;
     phone: string;
 }

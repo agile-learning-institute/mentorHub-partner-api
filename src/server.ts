@@ -3,6 +3,7 @@ import http from 'http';
 import config from './config/Config'
 import PartnerController from './controllers/PartnerController';
 import ConfigController from './controllers/ConfigController';
+import PeopleController from './controllers/PeopleController';
 import MongoIO from './config/MongoIO'
 
 export class Server {
@@ -17,6 +18,7 @@ export class Server {
 
         // Create controllers, inject dependencies
         const partnerController = new PartnerController(this.mongoIO);
+        const peopleController = new PeopleController(this.mongoIO);
         const configController = new ConfigController();
 
         // Initilize express app
@@ -30,6 +32,7 @@ export class Server {
         app.patch('/api/partner/:partnerId', (req, res) => partnerController.updatePartner(req, res));
         app.post('/api/partner/:partnerId/contact/:personId', (req, res) => partnerController.addContact(req, res));
         app.delete('/api/partner/:partnerId/contact/:personId', (req, res) => partnerController.removeContact(req, res));
+        app.get('/api/people/', (req, res) => peopleController.getPeople(req, res));
         app.get('/api/config/', (req, res) => configController.getConfig(req, res));
 
         // Start Server

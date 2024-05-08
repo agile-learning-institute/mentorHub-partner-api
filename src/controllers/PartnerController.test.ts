@@ -22,6 +22,7 @@ const mockMongoIO = (): MongoInterface => {
   return {
     connect: jest.fn(),
     disconnect: jest.fn(),
+    findPeople: jest.fn(),
     findPartners: jest.fn(),
     findPartner: jest.fn(),
     insertPartner: jest.fn(),
