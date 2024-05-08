@@ -11,13 +11,14 @@ export default class ConfigController {
   public getPartners = async (req: Request, res: Response) => {
     try {
       const results = await this.mongo.findPartners();
+      console.info("GetPartners Completed");
       res.status(200);
       res.json(results);
-      console.info("GetPartners Completed");
     } catch (error) {
+      let message = this.getMessage(error);
+      console.info("GetPartners Failed with:", message);
       res.status(500);
-      res.json(error);
-      console.info("GetPartners Failed");
+      res.json(message);
     }
   }
 
@@ -26,13 +27,14 @@ export default class ConfigController {
 
     try {
       const thePartner = await this.mongo.findPartner(theId)
+      console.info("GetPartner %s Completed", theId);
       res.status(200);
       res.json(thePartner);
-      console.info("GetPartner %s Completed", theId);
     } catch (error) {
+      let message = this.getMessage(error);
+      console.info("GetPartner %s Failed because %s", theId, message);
       res.status(500);
-      res.json(error);
-      console.info("GetPartner %s Failed because %s", theId, error);
+      res.json(message);
     }
     
   }
@@ -40,13 +42,14 @@ export default class ConfigController {
   public createPartner = async (req: Request, res: Response) => {
     try {
       const newPartner = await this.mongo.insertPartner(req.body)
+      console.info("AddPartner Completed for %s", newPartner._id);
       res.status(200);
       res.json(newPartner);
-      console.info("AddPartner Completed for %s", newPartner._id);
     } catch (error) {
+      let message = this.getMessage(error);
+      console.info("AddPartner Failed with %s", message);
       res.status(500);
-      res.json(error);
-      console.info("AddPartner Failed with %s", error);
+      res.json(message);
     }
   }
 
@@ -55,13 +58,14 @@ export default class ConfigController {
     
     try {
       const thePartner = await this.mongo.updatePartner(id, req.body);
+      console.info("Update Partner Completed for %s", id);
       res.status(200);
       res.json(thePartner);
-      console.info("Update Partner Completed for %s", id);
     } catch (error) {
+      let message = this.getMessage(error);
+      console.info("UpdatePartner Failed for %s with %s", id, message);
       res.status(500);
-      res.json(error);
-      console.info("UpdatePartner Failed for %s with %s", id, error);
+      res.json(message);
     }
   }
 
@@ -71,13 +75,14 @@ export default class ConfigController {
     
     try {
       const theContact = await this.mongo.addContact(partnerId, personId);
+      console.info("Add Contact %s to %s Complete", personId, partnerId);
       res.status(200);
       res.json(theContact);
-      console.info("Add Contact %s to %s Complete", personId, partnerId);
     } catch (error) {
+      let message = this.getMessage(error);
+      console.info("Add Contact %s to %s Failed for %s", personId, partnerId, message);
       res.status(500);
-      res.json(error);
-      console.info("Add Contact %s to %s Failed for %s", personId, partnerId, error);
+      res.json(message);
     }
   }
   public removeContact = async (req: Request, res: Response) => {
@@ -90,9 +95,16 @@ export default class ConfigController {
       res.json({});
       console.info("Remove Contact %s to %s Complete", personId, partnerId);
     } catch (error) {
+      let message = this.getMessage(error);
+      console.info("Remove Contact %s to %s Failed with %s", personId, partnerId, message);
       res.status(500);
-      res.json(error);
-      console.info("Remove Contact %s to %s Failed with %s", personId, partnerId, error);
+      res.json(message);
     }
+  }
+
+  private getMessage(error: any): {} {
+    let message = 'Unknown Error'
+    if (error instanceof Error) message = error.message
+    return {message: message};
   }
 }
