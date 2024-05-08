@@ -1,8 +1,5 @@
-import ShortName from '../interfaces/ShortName'
 import MongoInterface from '../interfaces/MongoInterface';
 import { Request, Response } from 'express';
-import Partner from '../interfaces/Partner';
-import { Contact } from '../interfaces/Contact';
 
 export default class ConfigController {
   mongo: MongoInterface;
@@ -12,10 +9,8 @@ export default class ConfigController {
   }
 
   public getPartners = async (req: Request, res: Response) => {
-    let results: ShortName[];
-
     try {
-      results = await this.mongo.findPartners();
+      const results = await this.mongo.findPartners();
       res.status(200);
       res.json(results);
       console.info("GetPartners Completed");
@@ -27,11 +22,10 @@ export default class ConfigController {
   }
 
   public getPartner = async (req: Request, res: Response) => {
-    let thePartner: Partner;
-    let theId = req.params.partnerId;
+    const theId = req.params.partnerId;
 
     try {
-      thePartner = await this.mongo.findPartner(theId)
+      const thePartner = await this.mongo.findPartner(theId)
       res.status(200);
       res.json(thePartner);
       console.info("GetPartner %s Completed", theId);
@@ -58,10 +52,9 @@ export default class ConfigController {
 
   public updatePartner = async (req: Request, res: Response) => {
     const id = req.params.partnerId;
-    let thePartner: Partner;
     
     try {
-      thePartner = await this.mongo.updatePartner(id, req.body);
+      const thePartner = await this.mongo.updatePartner(id, req.body);
       res.status(200);
       res.json(thePartner);
       console.info("Update Partner Completed for %s", id);
@@ -75,10 +68,9 @@ export default class ConfigController {
   public addContact = async (req: Request, res: Response) => {
     const partnerId = req.params.partnerId;
     const personId = req.params.personId;
-    let theContact: Contact;
     
     try {
-      theContact = await this.mongo.addContact(partnerId, personId);
+      const theContact = await this.mongo.addContact(partnerId, personId);
       res.status(200);
       res.json(theContact);
       console.info("Add Contact %s to %s Complete", personId, partnerId);
