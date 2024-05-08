@@ -5,6 +5,7 @@ import PartnerController from './controllers/PartnerController';
 import ConfigController from './controllers/ConfigController';
 import PeopleController from './controllers/PeopleController';
 import MongoIO from './config/MongoIO'
+import promBundle from 'express-prom-bundle'; 
 
 export class Server {
     private mongoIO: MongoIO;
@@ -16,14 +17,21 @@ export class Server {
 
     public async serve() {
 
+        // Initilize express app
+        const app = express();
+        app.use(express.json());
+
+        // Apply Prometheus monitoring middleware
+        const metricsMiddleware = promBundle({
+            includeMethod: true,
+            metricsPath: '/api/health'
+        });
+        app.use(metricsMiddleware);
+
         // Create controllers, inject dependencies
         const partnerController = new PartnerController(this.mongoIO);
         const peopleController = new PeopleController(this.mongoIO);
         const configController = new ConfigController();
-
-        // Initilize express app
-        const app = express();
-        app.use(express.json());
 
         // Map routes to controllers
         app.post('/api/partner/', (req, res) => partnerController.createPartner(req, res));
