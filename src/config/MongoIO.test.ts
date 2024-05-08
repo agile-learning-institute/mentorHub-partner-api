@@ -4,17 +4,16 @@
  * mh up mongodb
  */
 import MongoIO from './MongoIO';
-import Config from './Config';
+import config from './Config';
 import { Collection, Filter, Db } from 'mongodb';
 
 describe('MongIO', () => {
-    let config: Config;
     let mongoIo: MongoIO;
     let collection: Collection;
 
     beforeEach(async () => {
-        config = new Config();
-        mongoIo = new MongoIO(config);
+        config.initialize();
+        mongoIo = new MongoIO();
         await mongoIo.connect();
     });
 

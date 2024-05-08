@@ -1,53 +1,44 @@
 /**
  * This set of unit tests test config init from env
  */
-import Config from './Config';
+import config from './Config';
 
 describe('Config', () => {
-    let config: Config;
 
     test('test getter for default port', () => {
-        config = new Config();
         expect(config.getPort()).toBe(8084);
     });
 
     test('test getter for default getPartnerCollectionName', () => {
-        config = new Config();
-        expect(config.getPartnerCollectionName()).toBe(getConfigValue(config, "PARTNER_COLLECTION"));
+        expect(config.getPartnerCollectionName()).toBe(getConfigValue( "PARTNER_COLLECTION"));
     });
 
     test('test getter for default getPeopleCollectionName', () => {
-        config = new Config();
-        expect(config.getPeopleCollectionName()).toBe(getConfigValue(config, "PEOPLE_COLLECTION"));
+        expect(config.getPeopleCollectionName()).toBe(getConfigValue( "PEOPLE_COLLECTION"));
     });
 
     test('test getter for default getVersionCollectionName', () => {
-        config = new Config();
-        expect(config.getVersionCollectionName()).toBe(getConfigValue(config, "VERSION_COLLECTION"));
+        expect(config.getVersionCollectionName()).toBe(getConfigValue( "VERSION_COLLECTION"));
     });
 
     test('test getter for default getenumeratorsCollectionName', () => {
-        config = new Config();
-        expect(config.getenumeratorsCollectionName()).toBe(getConfigValue(config, "ENUMERATORS_COLLECTION"));
+        expect(config.getenumeratorsCollectionName()).toBe(getConfigValue( "ENUMERATORS_COLLECTION"));
     });
 
     test('test getter for default getConfigFolder()', () => {
-        config = new Config();
-        expect(config.getConfigFolder()).toBe(getConfigValue(config, "CONFIG_FOLDER"));
+        expect(config.getConfigFolder()).toBe(getConfigValue( "CONFIG_FOLDER"));
     });
 
     test('test getter for default getConnectionString', () => {
-        config = new Config();
         expect(config.getConnectionString()).toBe("mongodb://root:example@localhost:27017");
-        expect(getConfigValue(config, "CONNECTION_STRING")).toBe("secret");
+        expect(getConfigValue( "CONNECTION_STRING")).toBe("secret");
     });
 
     test('test getter for default getDbName', () => {
-        config = new Config();
-        expect(config.getDbName()).toBe(getConfigValue(config, "DB_NAME"));
+        expect(config.getDbName()).toBe(getConfigValue( "DB_NAME"));
     });
 
-    function getConfigValue(config: Config, configItemName: string): string {
+    function getConfigValue(configItemName: string): string {
         const items = config.configItems;
 
         const item = items.find(i => i.name === configItemName);

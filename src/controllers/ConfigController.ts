@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
-import Config from '../config/Config';
+import config from '../config/Config';
 
 export default class ConfigController {
-  cfg: Config;
 
-  constructor(config: Config) {
-    this.cfg = config;
+  constructor() {
   }
 
   public getConfig = async (req: Request, res: Response) => {
-    res.json(this.cfg);
+    res.json(config);
     res.status(200);
     console.info("GetConfig Completed");
   };

@@ -21,17 +21,17 @@ export  class Config {
     configItems: ConfigItem[] = [];
     versions: CollectionVersion[] = [];
     enumerators: any = {};
-    apiVersion: string;
+    apiVersion: string = "";
 
     // Private Properties
     #configFolder: string = "./";
-    #port: IntegerType;
-    #connectionString: string;
-    #dbName: string;
-    #partnerCollectionName: string;
-    #peopleCollectionName: string
-    #versionCollectionName: string;
-    #enumeratorsCollectionName: string;
+    #port: number = 8084;
+    #connectionString: string = "";
+    #dbName: string = "";
+    #partnerCollectionName: string = "";
+    #peopleCollectionName: string = ""
+    #versionCollectionName: string = "";
+    #enumeratorsCollectionName: string = "";
 
 
     /**
@@ -41,7 +41,10 @@ export  class Config {
         this.initialize();
     }
 
-    public initialize() {        
+    public initialize() {      
+        this.configItems = [];
+        this.versions = [];
+        this.enumerators = {};  
         this.apiVersion = "1.0." + this.getConfigValue("BUILT_AT", "LOCAL", false);
         this.#configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
         this.#port = parseInt(this.getConfigValue("PORT", "8084", false));
