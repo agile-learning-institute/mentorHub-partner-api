@@ -39,13 +39,12 @@ npm run container
 NOTE: This will also start the backing database and initlize test data
 
 ## API Testing with StepCI
-
-If you have installed StepCI you can run the StepCI Black Box tests with
 ```bash
 npm run stepci
 ```
+REQUIRES Step CI
 
-NOTE: This expects to find the API running with test data loaded. To build and run the containers with fresh test dataa before running the StepCI tests
+NOTE: Step CI tests expect to find the API running at localhost with test data loaded. To build and run the containers with fresh test data before running the StepCI tests use:
 ```bash
 npm run blackbox
 ```
@@ -61,7 +60,6 @@ This endpoint supports the promethius monitoring standards for a healthcheck end
 curl http://localhost:8084/api/health/
 
 ```
-NOTE: Not Yet Functional
 
 ### Test Config Endpoint
 
