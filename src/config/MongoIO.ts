@@ -119,7 +119,7 @@ export default class MongoIO implements MongoInterface {
         $lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' }
       },
       {
-        $project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { firstName: '$$contact.firstName', lastName: '$$contact.lastName', phone: '$$contact.phone' } } } }
+        $project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } }
       }
     ];
 
@@ -188,9 +188,12 @@ export default class MongoIO implements MongoInterface {
 
     // Get the contact from people
     filter = { "_id": personID };
-    let options = { projection: { _id: 1, firstName: 1, lastName: 1, phone: 1 } };
+    let options = { projection: { _id: 1, firstName: 1, lastName: 1, phone: 1, eMail: 1 } };
     let theContact: Contact;
     theContact = await this.peopleCollection.findOne(filter, options) as Contact;
+    if (!theContact) {
+      throw new Error('Add Contact ${personId} to partner ${partnerId} - Person Not Found!`);')
+    }
 
     // add the personId to contacts
     filter = { "_id": partnerID };
