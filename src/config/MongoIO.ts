@@ -181,7 +181,7 @@ export default class MongoIO implements MongoInterface {
     if (partner.contacts) {      
       const index = partner.contacts.findIndex((id: ObjectId) => id.equals(personID));
       if (index != -1) {
-        throw new Error(`Add Contact ${personId} to partner ${partnerId} - already exists!.`);
+        throw new Error("Add Contact " + personId + " to partner " + partnerId + " - already exists!");
       }
     }
 
@@ -191,7 +191,7 @@ export default class MongoIO implements MongoInterface {
     let theContact: Contact;
     theContact = await this.peopleCollection.findOne(filter, options) as Contact;
     if (!theContact) {
-      throw new Error('Add Contact ${personId} to partner ${partnerId} - Person Not Found!`);')
+      throw new Error("Add Contact " + personId + " to partner " + partnerId + "Person Not Found!");
     }
 
     // add the personId to contacts
@@ -228,7 +228,7 @@ export default class MongoIO implements MongoInterface {
     // Remove the contact from the list
     const index = partner.contacts.findIndex((id: ObjectId) => id.equals(personID));
     if (index === -1) {
-      throw new Error(`Remove Contact ${personId} not found in partner ${partnerId}.`);
+      throw new Error("Remove Contact " + personId + " not found in partner " + partnerId);
     }
     partner.contacts.splice(index, 1);
 
