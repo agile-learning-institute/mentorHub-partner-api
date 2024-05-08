@@ -3,7 +3,6 @@ import config from './Config';
 import MongoInterface from '../interfaces/MongoInterface'
 import CollectionVersion from '../interfaces/CollectionVersion';
 import Enumerators from '../interfaces/Enumerators';
-import ShortName from '../interfaces/ShortName';
 import Partner from '../interfaces/Partner';
 import { Contact } from '../interfaces/Contact';
 
@@ -94,14 +93,14 @@ export default class MongoIO implements MongoInterface {
     return results;
   }
 
-  public async findPartners(): Promise<ShortName[]> {
+  public async findPartners(): Promise<Partner[]> {
     if (!this.partnerCollection) {
       throw new Error("findPartners database not connected");
     }
     const filter = { "status": { "$ne": "Archived" } };
     const options = { projection: { _id: 1, name: 1 } };
-    let results: ShortName[];
-    results = await this.partnerCollection.find(filter, options).toArray() as ShortName[];
+    let results: Partner[];
+    results = await this.partnerCollection.find(filter, options).toArray() as Partner[];
     return results;
   }
 
