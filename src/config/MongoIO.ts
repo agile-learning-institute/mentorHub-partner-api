@@ -1,6 +1,6 @@
-/**
- * Class MongoIO implementes all mongodb I-O.
- */
+/********************************************************************************
+* Class MongoIO implementes all mongodb I-O.
+*/
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
 import config from './Config';
 import MongoInterface from '../interfaces/MongoInterface'
@@ -10,7 +10,7 @@ import Partner from '../interfaces/Partner';
 import { Contact } from '../interfaces/Contact';
 
 
-/**
+/********************************************************************************
  * Class Properties
  */
 export default class MongoIO implements MongoInterface {
@@ -21,17 +21,17 @@ export default class MongoIO implements MongoInterface {
   private versionCollection?: Collection;
   private enumeratorsCollection?: Collection;
 
-  /**
+  /********************************************************************************
    * Constructor 
    */
   constructor() {
   }
 
-  /**
-  * Connect to the Mongo Database, initilize
-  * connection related objects, and load versions 
-  * and enumerators
-  */
+  /********************************************************************************
+   * Connect to the Mongo Database, initilize
+   * connection related objects, and load versions 
+   * and enumerators
+   */
   public async connect(): Promise<void> {
     const connectionString = config.getConnectionString();
     const dbName = config.getDbName();
@@ -47,7 +47,7 @@ export default class MongoIO implements MongoInterface {
     console.info("Database", dbName, "Connected");
   }
 
-  /**
+  /********************************************************************************
    * Disconnect from the database
    */
   public async disconnect(): Promise<void> {
@@ -58,7 +58,7 @@ export default class MongoIO implements MongoInterface {
     }
   }
 
-  /**
+  /********************************************************************************
    * Get a list of people
    * @returns Contacts
    */
@@ -73,7 +73,7 @@ export default class MongoIO implements MongoInterface {
     return results;
   }
 
-  /**
+  /********************************************************************************
    * Get a list of all Partners
    * @returns Partner[]
    */
@@ -88,8 +88,8 @@ export default class MongoIO implements MongoInterface {
     return results;
   }
 
-  /**
-   * Get a Partner by ID
+  /********************************************************************************
+   * Get a Partner by ID, uses an aggregation to resolve contact personId's with person information.
    * @param id 
    * @returns Partner
    */
@@ -100,9 +100,9 @@ export default class MongoIO implements MongoInterface {
 
     const partnerId = new ObjectId(id);
     const pipeline = [
-      {$match: { _id: partnerId }},
-      {$lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' }},
-      {$project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } }}
+      { $match: { _id: partnerId } },
+      { $lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' } },
+      { $project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } } }
     ];
 
     let results: Partner | null;
@@ -114,7 +114,7 @@ export default class MongoIO implements MongoInterface {
     }
   }
 
-  /**
+  /********************************************************************************
    * Insert a new Partner
    * @param thePartner 
    * @returns Inserted Values
@@ -131,7 +131,7 @@ export default class MongoIO implements MongoInterface {
     return await this.findPartner(id);
   }
 
-  /**
+  /********************************************************************************
    * Update a partner by ID
    * @param id 
    * @param data to update
@@ -155,7 +155,7 @@ export default class MongoIO implements MongoInterface {
     return this.findPartner(id);
   }
 
-  /**
+  /********************************************************************************
    * Add a contact to a partner
    * @param partnerId 
    * @param personId 
@@ -176,9 +176,9 @@ export default class MongoIO implements MongoInterface {
     if (!partner) {
       throw new Error("addContact Partner Not Found" + partnerId);
     }
-    
+
     // See if the contact already exists
-    if (partner.contacts) {      
+    if (partner.contacts) {
       const index = partner.contacts.findIndex((id: ObjectId) => id.equals(personID));
       if (index != -1) {
         throw new Error("Add Contact " + personId + " to partner " + partnerId + " - already exists!");
@@ -205,7 +205,7 @@ export default class MongoIO implements MongoInterface {
     }
   }
 
-  /**
+  /********************************************************************************
    * Remove a contact from a partner
    * @param partnerId 
    * @param personId 
@@ -238,7 +238,7 @@ export default class MongoIO implements MongoInterface {
     return;
   }
 
-  /**
+  /********************************************************************************
    * Load the collection Versions array
    */
   public async loadVersions(): Promise<void> {
@@ -250,7 +250,7 @@ export default class MongoIO implements MongoInterface {
     config.versions = versions;
   }
 
-  /**
+  /********************************************************************************
    * Load the Enumerators based on a Collection Version
    * @param collectionName of the collection to use
    */
@@ -272,7 +272,7 @@ export default class MongoIO implements MongoInterface {
     let enumerations: Enumerators;
     enumerations = await this.enumeratorsCollection.findOne(query) as Enumerators;
     if (!enumerations) {
-      throw new Error("Enumerators not found for version:" + collectionName + ":" + theVersionString );
+      throw new Error("Enumerators not found for version:" + collectionName + ":" + theVersionString);
     }
     config.enumerators = enumerations.enumerators;
   }
