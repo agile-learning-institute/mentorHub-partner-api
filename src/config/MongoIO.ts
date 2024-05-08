@@ -1,5 +1,5 @@
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
-import Config from './Config';
+import config from './Config';
 import MongoInterface from '../interfaces/MongoInterface'
 import CollectionVersion from '../interfaces/CollectionVersion';
 import Enumerators from '../interfaces/Enumerators';
@@ -11,7 +11,6 @@ import { Contact } from '../interfaces/Contact';
  * Class MongoIO implementes all mongodb I-O.
  */
 export default class MongoIO implements MongoInterface {
-  private config: Config;
   private client?: MongoClient;
   private db?: Db;
   private peopleCollection?: Collection;
@@ -20,10 +19,9 @@ export default class MongoIO implements MongoInterface {
   private enumeratorsCollection?: Collection;
 
   /**
-   * Constructor gets configuration values
+   * Constructor 
    */
-  constructor(config: Config) {
-    this.config = config;
+  constructor() {
   }
 
   /**
@@ -32,16 +30,16 @@ export default class MongoIO implements MongoInterface {
   * and enumerators
   */
   public async connect(): Promise<void> {
-    const connectionString = this.config.getConnectionString();
-    const dbName = this.config.getDbName();
+    const connectionString = config.getConnectionString();
+    const dbName = config.getDbName();
 
     this.client = new MongoClient(connectionString);
     await this.client.connect();
     this.db = this.client.db(dbName);
-    this.peopleCollection = this.db.collection(this.config.getPeopleCollectionName());
-    this.partnerCollection = this.db.collection(this.config.getPartnerCollectionName());
-    this.versionCollection = this.db.collection(this.config.getVersionCollectionName());
-    this.enumeratorsCollection = this.db.collection(this.config.getenumeratorsCollectionName());
+    this.peopleCollection = this.db.collection(config.getPeopleCollectionName());
+    this.partnerCollection = this.db.collection(config.getPartnerCollectionName());
+    this.versionCollection = this.db.collection(config.getVersionCollectionName());
+    this.enumeratorsCollection = this.db.collection(config.getenumeratorsCollectionName());
 
     console.info("Database", dbName, "Connected");
   }
@@ -227,18 +225,18 @@ export default class MongoIO implements MongoInterface {
     }
     let versions: CollectionVersion[];
     versions = await this.versionCollection.find({}).toArray() as Array<CollectionVersion>;
-    this.config.versions = versions;
+    config.versions = versions;
   }
 
   public async loadEnumerators(collectionName: string): Promise<void> {
     if (!this.enumeratorsCollection) {
       throw new Error("loadEnumerators - Database not connected");
     }
-    if (this.config.versions.length === 0) {
+    if (config.versions.length === 0) {
       throw new Error("loadEnumerators - Versions not loaded");
     }
 
-    const theVersionString = this.config.versions
+    const theVersionString = config.versions
       .filter(version => version.collectionName === collectionName)
       .map(version => version.currentVersion.split('.').pop() || "0")
       .pop() || "0";
@@ -250,7 +248,7 @@ export default class MongoIO implements MongoInterface {
     if (!enumerations) {
       throw new Error("Enumerators not found for version:" + collectionName + ":" + theVersionString );
     }
-    this.config.enumerators = enumerations.enumerators;
+    config.enumerators = enumerations.enumerators;
   }
 
 }

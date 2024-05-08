@@ -15,27 +15,36 @@ interface ConfigItem {
     from: string;
 }
 
-export default class Config {
+export  class Config {
+    private static instance: Config; // Singleton 
+
     configItems: ConfigItem[] = [];
     versions: CollectionVersion[] = [];
     enumerators: any = {};
-    apiVersion: string;
+    apiVersion: string = "";
 
     // Private Properties
     #configFolder: string = "./";
-    #port: IntegerType;
-    #connectionString: string;
-    #dbName: string;
-    #partnerCollectionName: string;
-    #peopleCollectionName: string
-    #versionCollectionName: string;
-    #enumeratorsCollectionName: string;
+    #port: number = 8084;
+    #connectionString: string = "";
+    #dbName: string = "";
+    #partnerCollectionName: string = "";
+    #peopleCollectionName: string = ""
+    #versionCollectionName: string = "";
+    #enumeratorsCollectionName: string = "";
 
 
     /**
      * Constructor gets configuration values, loads the enumerators, and logs completion
      */
     constructor() {
+        this.initialize();
+    }
+
+    public initialize() {      
+        this.configItems = [];
+        this.versions = [];
+        this.enumerators = {};  
         this.apiVersion = "1.0." + this.getConfigValue("BUILT_AT", "LOCAL", false);
         this.#configFolder = this.getConfigValue("CONFIG_FOLDER", "/opt/mentorhub-partner-api", false);
         this.#port = parseInt(this.getConfigValue("PORT", "8084", false));
@@ -82,6 +91,16 @@ export default class Config {
         return value;
     }
 
+    /**
+     * Singleton Constructor
+     */
+    public static getInstance(): Config {
+        if (!Config.instance) {
+            Config.instance = new Config();
+        }
+        return Config.instance;
+    }
+
     /** 
      * Simple Getters
      */
@@ -117,3 +136,7 @@ export default class Config {
         return this.#dbName
     }
 }
+
+// Create a singleton instance of Config and export it
+const config = Config.getInstance();
+export default config;
