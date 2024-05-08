@@ -5,6 +5,7 @@ import { Contact } from './Contact';
 export default interface MongoInterface {
   connect(): Promise<void>
   disconnect(): Promise<void>;
+  findPeople(): Promise<Contact[]>;
   findPartners(): Promise<ShortName[]>;
   findPartner(id: string): Promise<Partner>;
   insertPartner(thePartner: Partner): Promise<Partner>;

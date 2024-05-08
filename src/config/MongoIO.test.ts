@@ -56,6 +56,16 @@ describe('MongIO', () => {
         expect(partners[0]._id).toBeDefined();
     });
 
+    test('test findPeople', async () => {
+        const people = await mongoIo.findPeople();
+        expect(people.length).toBeGreaterThan(1);
+        expect(people[0]._id).toBeDefined();
+        expect(people[0].firstName).toBeDefined();
+        expect(people[0].lastName).toBeDefined();
+        expect(people[0].phone).toBeDefined();
+        expect(people[0].eMail).toBeDefined();
+    });
+
     test('test findPartner', async () => {
         const partner = await mongoIo.findPartner("bbbb00000000000000000000");
         expect(partner.name).toBe("Junior Jobs");

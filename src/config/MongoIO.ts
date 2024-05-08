@@ -83,6 +83,17 @@ export default class MongoIO implements MongoInterface {
     return this.enumeratorsCollection;
   }
 
+  public async findPeople(): Promise<Contact[]> {
+    if (!this.peopleCollection) {
+      throw new Error("findPeople database not connected");
+    }
+    const filter = { "status": { "$ne": "Archived" } };
+    const options = { projection: { _id: 1, firstName: 1, lastName: 1, eMail: 1, phone: 1 } };
+    let results: Contact[];
+    results = await this.peopleCollection.find(filter, options).toArray() as Contact[];
+    return results;
+  }
+
   public async findPartners(): Promise<ShortName[]> {
     if (!this.partnerCollection) {
       throw new Error("findPartners database not connected");
