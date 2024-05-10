@@ -7,9 +7,9 @@
     "test": "jest --coverage",
     "prestart": "mh up mongodb; tsc",
     "start": "node dist/server.js",
-    "stepci": "stepci run ./test/partner-stepci.yaml",
+    "stepci": "stepci run ./test/partner.stepci.yaml",
     "preblackbox": "npm run container",
-    "blackbox": "stepci run ./test/partner-stepci.yaml",
+    "blackbox": "stepci run ./test/partner.stepci.yaml",
     "dev": "ts-node src/server.ts",
     "precontainer": "docker build --tag ghcr.io/agile-learning-institute/mentorhub-partner-api:latest .",
     "container": "mh up partner-api"
