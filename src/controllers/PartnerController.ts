@@ -80,7 +80,7 @@ export default class ConfigController {
       res.json(theContact);
     } catch (error) {
       let message = this.getMessage(error);
-      console.info("Add Contact %s to %s Failed for %s", personId, partnerId, message);
+      console.info("Add Contact failed with %s", message);
       res.status(500);
       res.json(message);
     }
@@ -96,15 +96,15 @@ export default class ConfigController {
       console.info("Remove Contact %s to %s Complete", personId, partnerId);
     } catch (error) {
       let message = this.getMessage(error);
-      console.info("Remove Contact %s to %s Failed with %s", personId, partnerId, message);
+      console.info("Remove Contact Failed with %s", message);
       res.status(500);
       res.json(message);
     }
   }
 
-  private getMessage(error: any): {} {
+  private getMessage(error: any): string {
     let message = 'Unknown Error'
-    if (error instanceof Error) message = error.message
-    return {message: message};
+    if (error instanceof Error) message = error.message;
+    return message;
   }
 }

@@ -2,9 +2,14 @@ version: "1.1"
 name: Partner API Check
 env:
   host: localhost:8084
+config:
+  loadTest:
+    phases:
+      - duration: 5
+        arrivalRate: 50
 tests:
-  observable:
-    name: Test Observability
+  observable-config:
+    name: Observability - Config
     steps:
       - name: GET Config Values
         http:
@@ -29,14 +34,17 @@ tests:
                 - enumerators
                 - apiVersion
               additionalProperties: false
+  observable-health:
+    name: Observability - Health
+    steps:
       - name: GET Health
         http:
           url: http://${{env.host}}/api/health/
           method: GET
           check:
             status: /200/
-  people:
-    name: Test /api/people endpoint
+  get-people:
+    name: Get People
     steps:
       - name: GET a list of people
         http:
@@ -66,8 +74,8 @@ tests:
                   - phone
                   - eMail
                 additionalProperties: false
-  partner:
-    name: Test /api/partner endpoints
+  partner-list:
+    name: Get Partners
     steps:
       - name: GET a list of partners
         http:
@@ -88,6 +96,9 @@ tests:
                   - _id
                   - name
                 additionalProperties: false
+  partner-get:
+    name: Get Partner
+    steps:
       - name: GET a single partner
         http:
           url: http://${{env.host}}/api/partner/bbbb00000000000000000001
@@ -141,6 +152,31 @@ tests:
                 - _id
                 - name
               additionalProperties: false
+  partner-get-notfound:
+    name: Get Partner
+    steps:
+      - name: Try to get an invalid partner
+        http:
+          url: http://${{env.host}}/api/partner/123456789012345678901234
+          method: GET
+          check:
+            status: /500/
+  partner-patch-notfound:
+    name: Get Partner
+    steps:
+      - name: Patch an invalid partner
+        http:
+          url: http://${{env.host}}/api/partner/123456789012345678901234
+          method: Patch
+          headers:
+            Content-Type: application/json
+          json: 
+            status: Archived
+          check:
+            status: /500/
+  partner-new:
+    name: New Partner
+    steps:
       - name: Create a New Partner
         http:
           url: http://${{env.host}}/api/partner/
@@ -158,45 +194,47 @@ tests:
             jsonpath:
               $.name: "A test PartnerName"
               $.description: "The description"
-      - name: Patch a Partner Description
+      - name: Archive Partner
         http:
           url: http://${{env.host}}/api/partner/${{captures.newId}}
           method: Patch
           headers:
             Content-Type: application/json
           json: 
-            description: An updated description
+            status: Archived
+            name: ${{captures.newId}}
           check:
             status: /200/
             jsonpath:
-              $.description: "An updated description"
-      - name: Check the Patched Value
+              $.status: Archived
+              $.name: ${{captures.newId}}
+      - name: Verify Archived
         http:
           url: http://${{env.host}}/api/partner/${{captures.newId}}
           method: GET
           check:
             status: /200/
             jsonpath:
-              $.name: A test PartnerName
-              $.description: "An updated description"
-  contact:
-    name: Test /api/partner/ID/contact endpoints
+              $.name: ${{captures.newId}}
+              $.status: Archived
+  contact-add-remove:
+    name: Add-Remove Contact
     steps:
-      - name: Create a New Partner to test with
+      - name: Create a New Partner
         http:
           url: http://${{env.host}}/api/partner/
           method: Post
           headers:
             Content-Type: application/json
           json: 
-            name: ContactTestingPartner
+            name: Add-Remove-Contact
           captures:
             newId:
-              jsonpath: $._id            
+              jsonpath: $._id
           check:
             status: /200/
             jsonpath:
-              $.name: "ContactTestingPartner"
+              $.name: "Add-Remove-Contact"
               $.contactDetails.length: 0
       - name: Add Contact
         http: 
@@ -217,23 +255,17 @@ tests:
             status: /200/
             jsonpath:
               $.contactDetails.length: 1
-              # $.contactDetails[0]._id: "aaaa00000000000000000000"
+              $.contactDetails[0]._id: "aaaa00000000000000000000"
               $.contactDetails[0].firstName: "James"
               $.contactDetails[0].lastName: "Smith"
               $.contactDetails[0].phone: "449-882-6722"
-      - name: Verify No-Dup-Contacts
-        http: 
-          url: http://${{env.host}}/api/partner/${{captures.newId}}/contact/aaaa00000000000000000000
-          method: Post
-          check:
-            status: /500/
       - name: Remove Contact
         http:
           url: http://${{env.host}}/api/partner/${{captures.newId}}/contact/aaaa00000000000000000000
           method: Delete
           check:
             status: /200/
-      - name: Check Contact Removed
+      - name: Verify Contact Removed
         http:
           url: http://${{env.host}}/api/partner/${{captures.newId}}
           method: Get
@@ -241,9 +273,103 @@ tests:
             status: /200/
             jsonpath:
               $.contactDetails.length: 0
-      - name: Verify No Invalid Contact
+      - name: Archive Partner
+        http:
+          url: http://${{env.host}}/api/partner/${{captures.newId}}
+          method: Patch
+          headers:
+            Content-Type: application/json
+          json: 
+            status: Archived
+            name: ${{captures.newId}}
+          check:
+            status: /200/
+            jsonpath:
+              $.status: Archived
+              $.name: ${{captures.newId}}
+  contact-add-duplicate:
+    name: Add Contact Error-Duplicate
+    steps:
+      - name: Create a New Partner
+        http:
+          url: http://${{env.host}}/api/partner/
+          method: Post
+          headers:
+            Content-Type: application/json
+          json: 
+            name: Add-Remove-Contact
+          captures:
+            newId:
+              jsonpath: $._id
+          check:
+            status: /200/
+            jsonpath:
+              $.name: "Add-Remove-Contact"
+              $.contactDetails.length: 0
+      - name: Add Contact
         http: 
-          url: http://${{env.host}}/api/partner/${{captures.newId}}/contact/123456789012345678901234
+          url: http://${{env.host}}/api/partner/${{captures.newId}}/contact/aaaa00000000000000000000
+          method: Post
+          check:
+            status: /200/
+            jsonpath:
+              $._id: "aaaa00000000000000000000"
+              $.firstName: "James"
+              $.lastName: "Smith"
+              $.phone: "449-882-6722"
+      - name: Verify No-Dup-Contacts
+        http: 
+          url: http://${{env.host}}/api/partner/${{captures.newId}}/contact/aaaa00000000000000000000
+          method: Post
+          check:
+            status: /500/
+      - name: Archive Partner
+        http:
+          url: http://${{env.host}}/api/partner/${{captures.newId}}
+          method: Patch
+          headers:
+            Content-Type: application/json
+          json: 
+            status: Archived
+            name: ${{captures.newId}}
+          check:
+            status: /200/
+            jsonpath:
+              $.status: Archived
+              $.name: ${{captures.newId}}
+  contact-add-invalid-person:
+    name: Add Contact Error-Invalid PersonID
+    steps:
+      - name: Post Invalid
+        http: 
+          url: http://${{env.host}}/api/partner/bbbb00000000000000000001/contact/123456789012345678901234
+          method: Post
+          check:
+            status: /500/
+  contact-add-invalid-partner:
+    name: Add Contact Error-Invalid PartnerID
+    steps:
+      - name: Post Invalid
+        http: 
+          url: http://${{env.host}}/api/partner/123456789012345678901234/contact/aaaa00000000000000000000
+          method: Post
+          check:
+            status: /500/
+  contact-remove-invalid-notfound:
+    name: Remove Contact Error-Not Found
+    steps:
+      - name: Delete Invalid
+        http: 
+          url: http://${{env.host}}/api/partner/bbbb00000000000000000001/contact/123456789012345678901234
+          method: Post
+          check:
+            status: /500/
+  contact-remove-invalid-partner:
+    name: Remove Contact Error-Not Found
+    steps:
+      - name: Delete Invalid
+        http: 
+          url: http://${{env.host}}/api/partner/123456789012345678901234/contact/aaaa00000000000000000000
           method: Post
           check:
             status: /500/

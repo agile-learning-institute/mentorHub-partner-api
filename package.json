@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "stepci": "stepci run ./test/partner.stepci.yaml",
     "preblackbox": "npm run container",
-    "blackbox": "stepci run ./test/partner.stepci.yaml",
+    "blackbox": "npm run stepci",
+    "loadtest": "stepci run ./test/partner.stepci.yaml --loadtest",
     "dev": "ts-node src/server.ts",
     "precontainer": "docker build --tag ghcr.io/agile-learning-institute/mentorhub-partner-api:latest .",
     "container": "mh up partner-api"
