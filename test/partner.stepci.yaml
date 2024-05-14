@@ -5,8 +5,8 @@ env:
 config:
   loadTest:
     phases:
-      - duration: 2
-        arrivalRate: 65
+      - duration: 5
+        arrivalRate: 50
 tests:
   observable-config:
     name: Observability - Config
