@@ -26,11 +26,17 @@ npm install
 npm run build
 ```
 
-### Run the API locally
+### Run the API locally with Backing Services
 ```bash
 npm run start
 ```
 NOTE: This will also start the backing database and initlize test data
+
+### Run the API locally
+```bash
+npm run local
+```
+NOTE: This command assumes that the backing services are already running
 
 ### Build and Test the API container locally
 ```bash
