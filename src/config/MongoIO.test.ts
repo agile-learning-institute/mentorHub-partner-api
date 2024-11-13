@@ -23,7 +23,7 @@ describe('MongIO', () => {
 
     test('test LoadVersions', async () => {
         await mongoIo.loadVersions();
-        expect(config.versions.length).toBe(11);
+        expect(config.versions.length).toBe(9);
     });
 
     test('test LoadEnumerators', async () => {

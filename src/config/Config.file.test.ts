@@ -37,6 +37,10 @@ describe('Config', () => {
         testConfigFileValue("ENUMERATORS_COLLECTION");
     });
 
+    test('test PERSON_UI_HOST', () => {
+        testConfigFileValue("PERSON_UI_HOST");
+    });
+
     function testConfigFileValue(configName: string) {
         const items = config.configItems;
 
