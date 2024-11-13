@@ -131,6 +131,11 @@ tests:
                         type: string
                       phone:
                         type: string
+                    required:
+                      - _id
+                      - firstName
+                      - lastName
+                      - phone
                 lastSaved:
                   type: object
                   properties:
@@ -151,6 +156,11 @@ tests:
               required:
                 - _id
                 - name
+                - status
+                - description
+                - url
+                - contactDetails
+                - lastSaved
               additionalProperties: false
   partner-get-notfound:
     name: Get Partner

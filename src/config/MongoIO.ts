@@ -102,7 +102,7 @@ export default class MongoIO implements MongoInterface {
     const pipeline = [
       { $match: { _id: partnerId } },
       { $lookup: { from: 'people', localField: 'contacts', foreignField: '_id', as: 'contactDetails' } },
-      { $project: { _id: 1, name: 1, status: 1, description: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } } }
+      { $project: { _id: 1, name: 1, status: 1, description: 1, url: 1, lastSaved: 1, contactDetails: { $map: { input: '$contactDetails', as: 'contact', in: { _id: "$$contact._id", firstName: '$$contact.firstName', lastName: '$$contact.lastName', eMail: '$$contact.eMail', phone: '$$contact.phone' } } } } }
     ];
 
     let results: Partner | null;
