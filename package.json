@@ -5,8 +5,9 @@
   "scripts": {
     "build": "tsc",
     "test": "jest --coverage",
-    "prestart": "mh up mongodb; tsc",
-    "start": "node dist/server.js",
+    "prestart": "mh down; mh up mongodb; tsc",
+    "start": "npm run local",
+    "local": "node dist/server.js",
     "stepci": "stepci run ./test/partner.stepci.yaml",
     "preblackbox": "npm run container",
     "blackbox": "npm run stepci",
