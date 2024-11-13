@@ -47,6 +47,10 @@ describe('Config', () => {
         testConfigDefaultValue("ENUMERATORS_COLLECTION","enumerators");
     });
 
+    test('test PERSON_UI_HOST', () => {
+        testConfigDefaultValue("PERSON_UI_HOST","localhost:8083");
+    });
+
     function testConfigDefaultValue(configName: string, expectedValue: string) {
         config.initialize();
 

@@ -37,6 +37,10 @@ describe('Config', () => {
         testConfigEnvironmentValue("ENUMERATORS_COLLECTION");
     });
 
+    test('test PERSON_UI_HOST', () => {
+        testConfigEnvironmentValue("PERSON_UI_HOST");
+    });
+
     function testConfigEnvironmentValue(configName: string) {
         process.env[configName] = "ENVIRONMENT";
         config.initialize();
