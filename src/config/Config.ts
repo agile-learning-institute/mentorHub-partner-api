@@ -54,7 +54,7 @@ export  class Config {
         this.#peopleCollectionName = this.getConfigValue("PEOPLE_COLLECTION", "people", false);
         this.#versionCollectionName = this.getConfigValue("VERSION_COLLECTION", "msmCurrentVersions", false);
         this.#enumeratorsCollectionName = this.getConfigValue("ENUMERATORS_COLLECTION", "enumerators", false);
-        this.#personUiHost = this.getConfigValue("PERSON_UI_HOST", "localhost:8083", false);
+        this.#personUiHost = this.getConfigValue("PERSON_UI_HOST", "http://localhost:8083", false);
 
         console.info("Configuration Initilized:", JSON.stringify(this.configItems));
     }
