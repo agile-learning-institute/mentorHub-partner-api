@@ -23,7 +23,7 @@ FROM node:16 AS run
 # ENV MSM_ROOT=/opt/mongoSchemaManager
 # ENV DB_NAME=test
 # ENV LOAD_TEST_DATA=false
-# ENV PERSON_UI_HOST=localhost:8083
+# ENV PERSON_UI_HOST=http://localhost:8083
 
 # Copy built assets from build stage 
 RUN mkdir -p /opt/app && chown node:node /opt/app

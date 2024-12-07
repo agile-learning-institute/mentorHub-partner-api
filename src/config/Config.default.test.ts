@@ -48,7 +48,7 @@ describe('Config', () => {
     });
 
     test('test PERSON_UI_HOST', () => {
-        testConfigDefaultValue("PERSON_UI_HOST","localhost:8083");
+        testConfigDefaultValue("PERSON_UI_HOST","http://localhost:8083");
     });
 
     function testConfigDefaultValue(configName: string, expectedValue: string) {
