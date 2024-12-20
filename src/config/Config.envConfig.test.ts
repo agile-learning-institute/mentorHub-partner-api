@@ -5,55 +5,92 @@ import config from './Config';
 
 describe('Config', () => {
 
-    test('test BUILT_AT', () => {
-        testConfigEnvironmentValue("BUILT_AT");
-    });
+    beforeEach(() => {
+        // Setup environment variables
+        for (const [key, defaultValue] of Object.entries({
+            ...config.stringPropertyDefaults,
+            ...config.secretStringPropertyDefaults
+        })) {
+            process.env[key] = "ENV_VALUE";
+        }
+        for (const [key, defaultValue] of Object.entries(
+            config.integerPropertyDefaults
+        )) {
+            process.env[key] = "1234";
+        }
+        for (const [key, defaultValue] of Object.entries(
+            config.secretJsonPropertyDefaults
+        )) {
+            process.env[key] = '{"foo":"bar"}';
+        }
 
-    test('test CONFIG_FOLDER', () => {
-        testConfigEnvironmentValue("CONFIG_FOLDER");
-    });
-
-    test('test DB_NAME', () => {
-        testConfigEnvironmentValue("DB_NAME");
-    });
-
-    test('test PORT', () => {
-        testConfigEnvironmentValue("PORT");
-    });
-
-    test('test PARTNER_COLLECTION', () => {
-        testConfigEnvironmentValue("PARTNER_COLLECTION");
-    });
-
-    test('test PEOPLE_COLLECTION', () => {
-        testConfigEnvironmentValue("PEOPLE_COLLECTION");
-    });
-
-    test('test VERSION_COLLECTION', () => {
-        testConfigEnvironmentValue("VERSION_COLLECTION");
-    });
-
-    test('test ENUMERATORS_COLLECTION', () => {
-        testConfigEnvironmentValue("ENUMERATORS_COLLECTION");
-    });
-
-    test('test PERSON_UI_HOST', () => {
-        testConfigEnvironmentValue("PERSON_UI_HOST");
-    });
-
-    function testConfigEnvironmentValue(configName: string) {
-        process.env[configName] = "ENVIRONMENT";
+        // Initialize the Config
         config.initialize();
-        process.env[configName] = "";
 
+        // Housekeep Environment variables
+        process.env.CONFIG_FOLDER = "";
+        for (const [key, defaultValue] of Object.entries({
+            ...config.stringPropertyDefaults,
+            ...config.secretStringPropertyDefaults,
+            ...config.integerPropertyDefaults,
+            ...config.secretJsonPropertyDefaults
+        })) {
+            process.env[key] = "ENV_VALUE";
+        }
+    });
+
+    test('test envStrings', () => {
+        const testScope = {
+            ...config.stringPropertyDefaults,
+            ...config.secretStringPropertyDefaults
+        };
+        for (const [key, defaultValue] of Object.entries(testScope)) {
+            expect((config as any)[key]).toBe("ENV_VALUE");
+        }
+    });
+
+    test('test envIntegers', () => {
+        for (const [key, defaultValue] of Object.entries(config.integerPropertyDefaults)) {
+            expect((config as any)[key]).toBe(1234);
+        }
+    });
+
+    test('test envSecretJson', () => {
+        for (const [key, defaultValue] of Object.entries(config.secretJsonPropertyDefaults)) {
+            expect((config as any)[key]).toStrictEqual({"foo":"bar"});
+        }
+    });
+
+    test('test envConfigItemStringDefaults', () => {
+        for (const [key, defaultValue] of Object.entries(config.stringPropertyDefaults)) {
+            testConfigItemValue(key, "ENV_VALUE")
+        }
+    });
+
+    test('test envConfigItemIntegerDefaults', () => {
+        for (const [key, defaultValue] of Object.entries(config.integerPropertyDefaults)) {
+            testConfigItemValue(key, "1234")
+        }
+    });
+
+    test('test envConfigItemSecretDefaults', () => {
+        const testScope = {
+            ...config.secretJsonPropertyDefaults,
+            ...config.secretStringPropertyDefaults
+        }
+        for (const [key, defaultValue] of Object.entries(testScope)) {
+            testConfigItemValue(key, "secret")
+        }
+    });
+
+    function testConfigItemValue(configName: string, expectedValue: string) {
         const items = config.configItems;
-
         const item = items.find(i => i.name === configName);
         expect(item).toBeDefined();
         if (item) {
             expect(item.name).toBe(configName);
             expect(item.from).toBe("environment");
-            expect(item.value).toBe("ENVIRONMENT");
+            expect(item.value).toBe(expectedValue);
         }
     }
 
