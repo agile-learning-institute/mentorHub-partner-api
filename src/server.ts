@@ -1,6 +1,6 @@
 import express from 'express';
 import http from 'http';
-import config from './config/Config'
+import config from './config/Config';
 import PartnerController from './controllers/PartnerController';
 import ConfigController from './controllers/ConfigController';
 import PeopleController from './controllers/PeopleController';
@@ -17,7 +17,7 @@ export class Server {
 
     public async serve() {
 
-        // Initilize express app
+        // Initialize express app
         const app = express();
         app.use(express.json());
 
@@ -44,7 +44,7 @@ export class Server {
         app.get('/api/config/', (req, res) => configController.getConfig(req, res));
 
         // Start Server
-        const port = config.getPort();
+        const port = config.PARTNERS_API_PORT;
         this.server = app.listen(port, () => {
             console.log(`Server running on port ${port}`);
         });
@@ -77,7 +77,7 @@ export class Server {
     const mongo = new MongoIO();
     await mongo.connect();
     await mongo.loadVersions();
-    await mongo.loadEnumerators(config.getPartnerCollectionName());
+    await mongo.loadEnumerators(config.PARTNERS_COLLECTION_NAME);
     const server = new Server(mongo);
     await server.serve();
 })();

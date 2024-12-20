@@ -3,7 +3,7 @@
 */
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
 import config from './Config';
-import MongoInterface from '../interfaces/MongoInterface'
+import MongoInterface from '../interfaces/MongoInterface';
 import CollectionVersion from '../interfaces/CollectionVersion';
 import Enumerators from '../interfaces/Enumerators';
 import Partner from '../interfaces/Partner';
@@ -33,16 +33,16 @@ export default class MongoIO implements MongoInterface {
    * and enumerators
    */
   public async connect(): Promise<void> {
-    const connectionString = config.getConnectionString();
-    const dbName = config.getDbName();
+    const connectionString = config.MONGO_CONNECTION_STRING;
+    const dbName = config.MONGO_DB_NAME;
 
     this.client = new MongoClient(connectionString);
     await this.client.connect();
     this.db = this.client.db(dbName);
-    this.peopleCollection = this.db.collection(config.getPeopleCollectionName());
-    this.partnerCollection = this.db.collection(config.getPartnerCollectionName());
-    this.versionCollection = this.db.collection(config.getVersionCollectionName());
-    this.enumeratorsCollection = this.db.collection(config.getenumeratorsCollectionName());
+    this.peopleCollection = this.db.collection(config.PEOPLE_COLLECTION_NAME);
+    this.partnerCollection = this.db.collection(config.PARTNERS_COLLECTION_NAME);
+    this.versionCollection = this.db.collection(config.VERSION_COLLECTION_NAME);
+    this.enumeratorsCollection = this.db.collection(config.ENUMERATORS_COLLECTION_NAME);
 
     console.info("Database", dbName, "Connected");
   }

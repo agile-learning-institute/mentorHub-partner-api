@@ -26,13 +26,10 @@ tests:
                   type: array
                 enumerators:
                   type: object
-                apiVersion:
-                  type: string
               required:
                 - configItems
                 - versions
                 - enumerators
-                - apiVersion
               additionalProperties: false
   observable-health:
     name: Observability - Health
