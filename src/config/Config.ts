@@ -172,6 +172,8 @@ export  class Config {
     public withToken(token: any): any {
         return {
             "configItems": this.configItems,
+            "versions": this.versions,
+            "enumerators": this.enumerators,
             "token": token
         };    
     }
