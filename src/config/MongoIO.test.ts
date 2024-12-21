@@ -5,120 +5,113 @@
  */
 import MongoIO from './MongoIO';
 import config from './Config';
-import { Collection, Filter, Db } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 describe('MongIO', () => {
     let mongoIo: MongoIO;
-    let collection: Collection;
 
     beforeEach(async () => {
         config.initialize();
         mongoIo = new MongoIO();
-        await mongoIo.connect();
+        await mongoIo.connect(config.PEOPLE_COLLECTION_NAME);
     });
 
     afterEach(async () => {
         await mongoIo.disconnect()
     });
 
-    test('test LoadVersions', async () => {
-        await mongoIo.loadVersions();
+    test('test Connection', async () => {
         expect(config.versions.length).toBe(9);
-    });
-
-    test('test LoadEnumerators', async () => {
-        await mongoIo.loadVersions();
-        await mongoIo.loadEnumerators("paths");
         expect(config.enumerators).toHaveProperty("defaultStatus");
         expect(config.enumerators.defaultStatus.Active).toBe("Not Deleted")
     });
 
-    test('test findPartners', async () => {
-        const partners = await mongoIo.findPartners();
-        expect(partners.length).toBeGreaterThan(1);
-        expect(partners[0].name).toBeDefined();
-        expect(partners[0]._id).toBeDefined();
+    test('test getAllFullDocuments()', async () => {
+        const match = {}
+        const project = {}
+        const order = {}
+        const results = await mongoIo.getDocuments(config.PEOPLE_COLLECTION_NAME, match, project, order)
+        expect(results.length).toBeGreaterThan(30);
+        expect(results[0]._id).toBeDefined();
+        expect(results[0].userName).toBeDefined();
+        expect(results[0].firstName).toBeDefined();
+        expect(results[0].lastName).toBeDefined();
+        expect(results[0].status).toBeDefined();
+        expect(results[0].roles).toBeDefined();
     });
 
-    test('test findPeople', async () => {
-        const people = await mongoIo.findPeople();
-        expect(people.length).toBeGreaterThan(1);
-        expect(people[0]._id).toBeDefined();
-        expect(people[0].firstName).toBeDefined();
-        expect(people[0].lastName).toBeDefined();
-        expect(people[0].phone).toBeDefined();
-        expect(people[0].eMail).toBeDefined();
+    test('test getSomePartialDocuments', async () => {
+        const match = {lastName:"Jones"};
+        const project = {_id:1, firstName:1, lastName:1}
+        const order = {}
+        const results = await mongoIo.getDocuments(config.PEOPLE_COLLECTION_NAME, match, project, order)
+        expect(results.length).toBe(7);
+        expect(results[0].userName).toBeUndefined();
+        expect(results[0].stats).toBeUndefined();
+        expect(String(results[0]._id)).toBe("aaaa00000000000000000024");
+        expect(results[0].firstName).toBe("Jame");
     });
 
-    test('test findPartner', async () => {
-        const partner = await mongoIo.findPartner("bbbb00000000000000000000");
-        expect(partner.name).toBe("Junior Jobs");
-        expect(partner.status).toBe("Inactive");
-        expect(partner.description).toBe("Members that are looking for junior level jobs");
-        expect(partner.lastSaved).toBeDefined();
-        expect(partner.contactDetails).toBeDefined();
-        expect(partner.contactDetails).toBeInstanceOf(Array);
-        const details = partner.contactDetails;
-        if (details) {
-            expect(details.length).toBe(2);
-            expect(details[0].firstName).toBe("Michael");
-            expect(details[0].lastName).toBe("Smith");
-            expect(details[0].phone).toBe("875-959-5595");
-            expect(details[1].firstName).toBe("Emily");
-            expect(details[1].lastName).toBe("Smith");
-            expect(details[1].phone).toBe("246-906-8608");
-        }
+    test('test getOrderByAscending', async () => {
+        const match = {lastName:"Jones", status: "Active"};
+        const project = {_id:1, firstName:1, lastName:1};
+        const order = {userName: 1};
+        const results = await mongoIo.getDocuments(config.PEOPLE_COLLECTION_NAME, match, project, order)
+        expect(results.length).toBe(2);
+        expect(results[0].userName).toBeUndefined();
+        expect(results[0].stats).toBeUndefined();
+        expect(String(results[0]._id)).toBe("aaaa00000000000000000025");
+        expect(results[0].firstName).toBe("Michael");
+        expect(results[0].lastName).toBe("Jones");
+        expect(String(results[1]._id)).toBe("aaaa00000000000000000029");
+        expect(results[1].firstName).toBe("Samuel");
+        expect(results[1].lastName).toBe("Jones");
     });
 
-    test('test insertPartner', async () => {
-        const input = { name: "Foo" };
-        const output = await mongoIo.insertPartner(input);
-        expect(output.name).toBe("Foo");
-
-        const id = output._id;
-        // await mongoIo.getPartnerCollection().findOneAndDelete({ _id: id });
+    test('test getOrderByDescending', async () => {
+        const match = {lastName:"Jones", status: "Active"};
+        const project = {_id:1, firstName:1, lastName:1};
+        const order = {userName: -1};
+        const results = await mongoIo.getDocuments(config.PEOPLE_COLLECTION_NAME, match, project, order)
+        expect(results.length).toBe(2);
+        expect(results[0].userName).toBeUndefined();
+        expect(results[0].stats).toBeUndefined();
+        expect(String(results[0]._id)).toBe("aaaa00000000000000000029");
+        expect(results[0].firstName).toBe("Samuel");
+        expect(results[0].lastName).toBe("Jones");
+        expect(String(results[1]._id)).toBe("aaaa00000000000000000025");
+        expect(results[1].firstName).toBe("Michael");
+        expect(results[1].lastName).toBe("Jones");
     });
 
-    test('test updatePartner', async () => {
-        let update = { description: "Updated Description" };
-        let thePartner = await mongoIo.updatePartner("bbbb00000000000000000001", update);
-        expect(thePartner.name).toBe("Enok");
-        expect(thePartner.description).toBe("Updated Description");
-
-        update = { description: "Reset Description" };
-        thePartner = await mongoIo.updatePartner("bbbb00000000000000000001", update);
-        expect(thePartner.name).toBe("Enok");
-        expect(thePartner.description).toBe("Reset Description");
+    test('test getDocument', async () => {
+        const id = "aaaa00000000000000000027";
+        const expected = {"_id":new ObjectId("aaaa00000000000000000027"),"userName":"EmilyJones","firstName":"Emily","lastName":"Jones","status":"Inactive","roles":["Member"],"partnerId":new ObjectId("bbbb00000000000000000001"),"title":"Distinguished","cadence":"Daily","eMail":"EmilyJones@fakemail.com","gitHub":"EmilyJones","device":"Mac (Intel)","location":"Asheville","phone":"290-453-3295","description":"I had a friend in high school named Rick Shaw, but he was fairly useless as a mode of transport.","lastSaved":{"atTime":new Date("2024-02-27T18:17:58.000Z"),"byUser":new ObjectId("00000001cfc5967f9ccead8a"),"fromIp":"192.168.1.3","correlationId":"ae078031-7de2-4519-bcbe-fbd5e72b69d3"}};
+        const document = await mongoIo.getDocument(config.PEOPLE_COLLECTION_NAME, id);
+        expect(document).toStrictEqual(expected);
     });
 
-    test('test addContact/removeContact', async () => {
-        let contact = await mongoIo.addContact("bbbb00000000000000000002", "aaaa00000000000000000011");
-        expect(contact.firstName).toBe("Alexande")
-        expect(contact.lastName).toBe("Smith");
-        expect(contact.phone).toBe("593-264-9430");
+    test('test CRUD_Document', async () => {
+        const newDocument = await mongoIo.insertDocument(config.PEOPLE_COLLECTION_NAME, {userName:"BigTester"});
+        expect(newDocument._id).toBeDefined();
+        expect(newDocument.userName).toBe("BigTester");
 
-        let partner = await mongoIo.findPartner("bbbb00000000000000000002");
-        expect(partner.name).toBe("Google Search");
-        expect(partner.contactDetails).toBeDefined();
-        expect(partner.contactDetails).toBeInstanceOf(Array);
-        let details = partner.contactDetails;
-        if (details) {
-            expect(details.length).toBe(1);
-            contact = details[0];
-            expect(contact.firstName).toBe("Alexande");
-            expect(contact.lastName).toBe("Smith");
-            expect(contact.phone).toBe("593-264-9430");
-        }
-        
-        await mongoIo.removeContact("bbbb00000000000000000002", "aaaa00000000000000000011")
-        partner = await mongoIo.findPartner("bbbb00000000000000000002");
-        expect(partner.name).toBe("Google Search");
-        expect(partner.contactDetails).toBeDefined();
-        expect(partner.contactDetails).toBeInstanceOf(Array);
-        details = partner.contactDetails;
-        if (details) {
-            expect(details.length).toBe(0);
-        }
+        const id = String(newDocument._id);
+        const getDocument = await mongoIo.getDocument(config.PEOPLE_COLLECTION_NAME, id);
+        expect(getDocument.userName).toBe("BigTester");
+
+        const updatedDocument = await mongoIo.updateDocument(config.PEOPLE_COLLECTION_NAME, id, {firstName:"Big"});
+        console.log("Updated: ", updatedDocument);
+        expect(updatedDocument._id).toBeDefined();
+        expect(updatedDocument.userName).toBe("BigTester");
+        expect(updatedDocument.firstName).toBe("Big");
+
+        const deletedDocument = await mongoIo.deleteDocument(config.PEOPLE_COLLECTION_NAME, id);
+        expect(updatedDocument._id).toBeDefined();
+        expect(updatedDocument.userName).toBe("BigTester");
+        expect(updatedDocument.firstName).toBe("Big");
+
+        const missingDocument = await mongoIo.getDocument(config.PEOPLE_COLLECTION_NAME, id);
+        expect(missingDocument).toBeNull;
     });
-
 });
