@@ -4,13 +4,15 @@
  * mh up mongodb
  */
 import MongoIO from './MongoIO';
-import config from './Config';
+import Config from './Config';
 import { ObjectId } from 'mongodb';
 
 describe('MongIO', () => {
     let mongoIo: MongoIO;
+    let config: Config;
 
     beforeEach(async () => {
+        config = Config.getInstance();
         config.initialize();
         mongoIo = new MongoIO();
         await mongoIo.connect(config.PEOPLE_COLLECTION_NAME);

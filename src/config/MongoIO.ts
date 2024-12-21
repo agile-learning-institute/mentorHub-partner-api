@@ -1,11 +1,16 @@
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
-import config from './Config';
+import Config from './Config';
+
 
 /********************************************************************************
  * Class Properties
  ********************************************************************************/
 export default class MongoIO {
+  private static instance: MongoIO; // Singleton Instance
+  
   private client?: MongoClient;
+  private mongodb?: Db;
+  private config = Config.getInstance();
 
   /********************************************************************************
    * Constructor (no-op)
@@ -18,10 +23,11 @@ export default class MongoIO {
    * Initialize config (versions, enumerators)
    */
   public async connect(primaryCollection: string): Promise<void> {
-    const connectionString = config.MONGO_CONNECTION_STRING;
+    const connectionString = this.config.MONGO_CONNECTION_STRING;
 
     this.client = new MongoClient(connectionString);
     await this.client.connect();
+    this.mongodb = this.client.db(this.config.MONGO_DB_NAME);
 
     await this.loadVersions();
     await this.loadEnumerators(primaryCollection);
@@ -46,10 +52,8 @@ export default class MongoIO {
    * @returns Array of documents
    ********************************************************************************/
   public async getDocuments(collectionName: string, match: Record<string, any> = {}, project: Record<string, any> = {}, sort: Record<string, any> = {}): Promise<any[]> {
-    if (!this.client) throw new Error("Database not connected");
-
-    const db = this.client.db(config.MONGO_DB_NAME);
-    const collection = db.collection(collectionName);
+    if (!this.client || !this.mongodb) throw new Error("Database not connected");
+    const collection = this.mongodb.collection(collectionName);
 
     // Construct query options
     const options: { projection?: Record<string, any>; sort?: Record<string, any> } = {};
@@ -61,17 +65,16 @@ export default class MongoIO {
     return results;
   }  
 
-/********************************************************************************
- * Get a Document by ID
- * @param collectionName - Name of the MongoDB collection
- * @param id - The document's ID (string representation of ObjectId)
- * @returns The document if found, or null if not found
- ********************************************************************************/
-public async getDocument(collectionName: string, id: string): Promise<any> {
-    if (!this.client) throw new Error("getDocument - Database not connected");
+  /********************************************************************************
+   * Get a Document by ID
+   * @param collectionName - Name of the MongoDB collection
+   * @param id - The document's ID (string representation of ObjectId)
+   * @returns The document if found, or null if not found
+   ********************************************************************************/
+  public async getDocument(collectionName: string, id: string): Promise<any> {
+    if (!this.client || !this.mongodb) throw new Error("Database not connected");
 
-    const db = this.client.db(config.MONGO_DB_NAME);
-    const collection = db.collection(collectionName);
+    const collection = this.mongodb.collection(collectionName);
     const match = {"_id": new ObjectId(id)};
     const results = await collection.findOne(match);
     return results;
@@ -84,10 +87,9 @@ public async getDocument(collectionName: string, id: string): Promise<any> {
    * @returns The inserted document with its `_id`
    ********************************************************************************/
   public async insertDocument(collectionName: string, document: Record<string, any>): Promise<any> {
-    if (!this.client) throw new Error("insertDocument - Database not connected");
+    if (!this.client || !this.mongodb) throw new Error("Database not connected");
 
-    const db = this.client.db(config.MONGO_DB_NAME);
-    const collection = db.collection(collectionName);
+    const collection = this.mongodb.collection(collectionName);
 
     // Insert the document into the collection
     const result = await collection.insertOne(document);
@@ -102,10 +104,9 @@ public async getDocument(collectionName: string, id: string): Promise<any> {
    * @returns The updated document 
    ********************************************************************************/
   public async updateDocument(collectionName: string, id: string, updates: Record<string, any>): Promise<any> {
-    if (!this.client) throw new Error("updateDocument - Database not connected");
+    if (!this.client || !this.mongodb) throw new Error("Database not connected");
 
-    const db = this.client.db(config.MONGO_DB_NAME);
-    const collection = db.collection(collectionName);
+    const collection = this.mongodb.collection(collectionName);
     const filter = { _id: new ObjectId(id) };
     const update = { $set: updates };
     const result = await collection.findOneAndUpdate(filter, update, { returnDocument: "after" });
@@ -119,10 +120,9 @@ public async getDocument(collectionName: string, id: string): Promise<any> {
    * @returns The deleted document if found, or null if no document was deleted
    ********************************************************************************/
   public async deleteDocument(collectionName: string, id: string): Promise<any> {
-    if (!this.client) throw new Error("deleteDocument - Database not connected");
+    if (!this.client || !this.mongodb) throw new Error("Database not connected");
 
-    const db = this.client.db(config.MONGO_DB_NAME);
-    const collection = db.collection(collectionName);
+    const collection = this.mongodb.collection(collectionName);
     const match = { _id: new ObjectId(id) };
     const result = await collection.findOneAndDelete(match);
     return result;
@@ -133,15 +133,13 @@ public async getDocument(collectionName: string, id: string): Promise<any> {
    * @returns void
    ********************************************************************************/
   public async loadVersions(): Promise<void> {
-    if (!this.client) throw new Error("Database not connected");
-
     const project = { _id: 0 }; 
-    const versions = await this.getDocuments(config.VERSION_COLLECTION_NAME, {}, project, {});
+    const versions = await this.getDocuments(this.config.VERSION_COLLECTION_NAME, {}, project, {});
 
     // Update the config with the retrieved versions
     if (!Array.isArray(versions)) throw new Error("Failed to load versions: Expected an array of documents");
 
-    config.versions = versions;
+    this.config.versions = versions;
     console.info("Versions Loaded:", versions.length);
   }
 
@@ -151,11 +149,10 @@ public async getDocument(collectionName: string, id: string): Promise<any> {
    * @returns void
    ********************************************************************************/
   public async loadEnumerators(primaryCollectionName: string): Promise<void> {
-    if (!this.client) throw new Error("Database not connected");
-    if (config.versions.length === 0) throw new Error("Versions not loaded");
+    if (this.config.versions.length === 0) throw new Error("Versions not loaded");
 
     // Get the current version string for the specified collection
-    const versionString = config.versions
+    const versionString = this.config.versions
         .filter(version => version.collectionName === primaryCollectionName)
         .map(version => version.currentVersion.split('.').pop() || "0")
         .pop() || "0";
@@ -163,14 +160,24 @@ public async getDocument(collectionName: string, id: string): Promise<any> {
 
     // Query to retrieve the enumerators
     const match = { version: version };
-    const enumerators = await this.getDocuments(config.ENUMERATORS_COLLECTION_NAME, match, {}, {});
+    const enumerators = await this.getDocuments(this.config.ENUMERATORS_COLLECTION_NAME, match, {}, {});
 
     // Validate the result and ensure enumerators are found
     if (!enumerators || enumerators.length === 0) {
         throw new Error(`Enumerators not found for collection: ${primaryCollectionName}, version: ${versionString}`);
     }
 
-    config.enumerators = enumerators[0].enumerators || [];
+    this.config.enumerators = enumerators[0].enumerators || [];
     console.info(`Enumerators loaded for collection: ${primaryCollectionName}, version: ${versionString}`);
+  }
+
+  /**
+   * Singleton Constructor
+   */
+  public static getInstance(): MongoIO {
+    if (!MongoIO.instance) {
+      MongoIO.instance = new MongoIO();
+    }
+    return MongoIO.instance;
   }
 }

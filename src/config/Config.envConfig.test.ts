@@ -1,9 +1,10 @@
 /**
  * This set of unit tests test config init from env
  */
-import config from './Config';
+import Config from './Config';
 
 describe('Config', () => {
+    let config = Config.getInstance();
 
     beforeEach(() => {
         // Setup environment variables

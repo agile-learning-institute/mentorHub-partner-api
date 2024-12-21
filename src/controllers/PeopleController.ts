@@ -1,26 +1,24 @@
-import MongoInterface from '../interfaces/MongoInterface';
+import PeopleService from '../services/PeopleService';
 import { Request, Response } from 'express';
-import { Contact } from '../interfaces/Contact';
+import { createBreadcrumb } from '../utils/Breadcrumb';
+import { createToken } from '../utils/Token';
 
 export default class PeopleController {
-  mongo: MongoInterface;
 
-  constructor(mongoIO: MongoInterface) {
-    this.mongo = mongoIO;
+  constructor() {
   }
 
   public getPeople = async (req: Request, res: Response) => {
-    let results: Contact[];
-
     try {
-      results = await this.mongo.findPeople();
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const results = await PeopleService.FindPeople(req.query, token);
       res.json(results);
       res.status(200);
-      console.info("GetPeople Completed");
+      console.info("GetPeople Completed", breadcrumb);
     } catch (error) {
-      res.json({error: error});
       res.status(500);
-      console.info("GetPeople Failed");
+      console.info("GetPeople Failed", error);
     }
   }
 }

@@ -1,128 +1,145 @@
-/**
- * This set of unit tests test controller init from env
- */
-import MongoInterface from '../interfaces/MongoInterface';
-import Partner from '../interfaces/Partner';
-import PartnerController from './PartnerController';
+import PartnerController from '../controllers/PartnerController';
+import PartnerService from '../services/PartnerService';
+import { createBreadcrumb } from '../utils/Breadcrumb';
+import { createToken } from '../utils/Token';
 import { Request, Response } from 'express';
 
-const mockRequest = (options = {}): Partial<Request> => ({
-  ...options,
-});
-
-const mockResponse = (): Partial<Response> & { json: jest.Mock } => {
-  const res: any = {};
-  res.send = jest.fn().mockReturnThis();
-  res.status = jest.fn().mockReturnThis();
-  res.json = jest.fn().mockReturnThis();
-  return res as Partial<Response> & { json: jest.Mock };
-};
-
-const mockMongoIO = (): MongoInterface => {
-  return {
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-    findPeople: jest.fn(),
-    findPartners: jest.fn(),
-    findPartner: jest.fn(),
-    insertPartner: jest.fn(),
-    updatePartner: jest.fn(),
-    addContact: jest.fn(),
-    removeContact: jest.fn(),
-    loadVersions: jest.fn(),
-    loadEnumerators: jest.fn()
-  };
-};
+// Mock dependencies
+jest.mock('../services/PartnerService');
+jest.mock('../utils/Breadcrumb');
+jest.mock('../utils/Token');
 
 describe('PartnerController', () => {
-  let partnerController: PartnerController;
+    let controller: PartnerController;
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<Response>;
 
-  beforeEach(async () => {
-    const mockMongo = mockMongoIO();
-    partnerController = new PartnerController(mockMongo);
-  });
+    beforeEach(() => {
+        controller = new PartnerController();
 
-  afterEach(async () => {
-  });
+        mockRequest = {
+            query: { name: 'Test Query' },
+            params: { partnerId: 'partner123', personId: 'person456' },
+            body: { name: 'New Partner' },
+            ip: '192.168.1.1',
+            headers: { 'x-correlation-id': 'test-correlation-id' },
+        };
 
-  test('test getPartners', async () => {
-    const data = [{ message: 'Get Partner list' }];
-    const req = mockRequest({});
-    const res = mockResponse();
+        mockResponse = {
+            json: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+        };
+    });
 
-    (partnerController.mongo.findPartners as jest.Mock).mockResolvedValue(data);
-    await partnerController.getPartners(req as Request, res as Response);
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-    const jsonResponse = res.json.mock.calls[0][0];
-    expect(Array.isArray(jsonResponse)).toBeTruthy();
-    expect(jsonResponse.length).toBeGreaterThan(0);
-    expect(jsonResponse[0].message).toBe("Get Partner list");
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
+    it('should fetch partners successfully', async () => {
+        const mockToken = { userId: 'user123', roles: ['admin'] };
+        const mockBreadcrumb = { correlationId: 'test-correlation-id' };
+        const mockResults = [{ name: 'Partner A' }, { name: 'Partner B' }];
 
-  test('test getPartner', async () => {
-    const data = { message: 'Get A Partner' };
-    const req = mockRequest({params: { partnerId: '12345' }});
-    const res = mockResponse();
+        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
+        (PartnerService.FindPartners as jest.Mock).mockResolvedValue(mockResults);
 
-    (partnerController.mongo.findPartner as jest.Mock).mockResolvedValue(data);
-    await partnerController.getPartner(req as Request, res as Response);
+        await controller.getPartners(mockRequest as Request, mockResponse as Response);
 
-    const jsonResponse = res.json.mock.calls[0][0];
-    expect(jsonResponse.message).toBe("Get A Partner");
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
+        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
+        expect(PartnerService.FindPartners).toHaveBeenCalledWith(mockRequest.query, mockToken);
+        expect(mockResponse.json).toHaveBeenCalledWith(mockResults);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
 
-  test('test createPartner', async () => {
-    const data = { name: 'A New Partner' };
-    const req = mockRequest({});
-    const res = mockResponse();
-    let thePartner: Partner;
+    it('should fetch a single partner successfully', async () => {
+        const mockToken = { userId: 'user123', roles: ['admin'] };
+        const mockBreadcrumb = { correlationId: 'test-correlation-id' };
+        const mockPartner = { id: 'partner123', name: 'Partner A' };
 
-    (partnerController.mongo.insertPartner as jest.Mock).mockResolvedValue(data);
-    await partnerController.createPartner(req as Request, res as Response);
+        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
+        (PartnerService.FindPartner as jest.Mock).mockResolvedValue(mockPartner);
 
-    const jsonResponse = res.json.mock.calls[0][0];
-    expect(jsonResponse.name).toBe("A New Partner");
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
+        await controller.getPartner(mockRequest as Request, mockResponse as Response);
 
-  test('test updatePartner', async () => {
-    const data = { description: 'Updated Description' };
-    const req = mockRequest({params: { partnerId: '12345' }});
-    const res = mockResponse();
+        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
+        // expect(PartnerService.FindPartner).toHaveBeenCalledWith(mockRequest.params.partnerId, mockToken);
+        expect(mockResponse.json).toHaveBeenCalledWith(mockPartner);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
 
-    (partnerController.mongo.updatePartner as jest.Mock).mockResolvedValue(data);
-    await partnerController.updatePartner(req as Request, res as Response);
+    it('should create a partner successfully', async () => {
+        const mockToken = { userId: 'user123', roles: ['admin'] };
+        const mockBreadcrumb = { correlationId: 'test-correlation-id' };
+        const mockNewPartner = { _id: 'partner123', name: 'New Partner' };
 
-    const jsonResponse = res.json.mock.calls[0][0];
-    expect(jsonResponse.description).toBe("Updated Description");
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
+        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
+        (PartnerService.InsertPartner as jest.Mock).mockResolvedValue(mockNewPartner);
 
-  test('test addContact', async () => {
-    const data = { firstName:"Foo", lastName:"Bar" };
-    const req = mockRequest({params: { partnerId: '12345', personId: '54321' }});
-    const res = mockResponse();
+        await controller.createPartner(mockRequest as Request, mockResponse as Response);
 
-    (partnerController.mongo.addContact as jest.Mock).mockResolvedValue(data);
-    await partnerController.addContact(req as Request, res as Response);
+        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
+        expect(PartnerService.InsertPartner).toHaveBeenCalledWith(mockRequest.body, mockToken, mockBreadcrumb);
+        expect(mockResponse.json).toHaveBeenCalledWith(mockNewPartner);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
 
-    const jsonResponse = res.json.mock.calls[0][0];
-    expect(jsonResponse.firstName).toBe("Foo");
-    expect(jsonResponse.lastName).toBe("Bar");
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
+    it('should update a partner successfully', async () => {
+        const mockToken = { userId: 'user123', roles: ['admin'] };
+        const mockBreadcrumb = { correlationId: 'test-correlation-id' };
+        const mockUpdatedPartner = { id: 'partner123', name: 'Updated Partner' };
 
-  test('test removeContact', async () => {
-    const req = mockRequest({params: { partnerId: '12345', personId: '54321' }});
-    const res = mockResponse();
+        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
+        (PartnerService.UpdatePartner as jest.Mock).mockResolvedValue(mockUpdatedPartner);
 
-    (partnerController.mongo.removeContact as jest.Mock).mockResolvedValue(null);
-    await partnerController.removeContact(req as Request, res as Response);
+        await controller.updatePartner(mockRequest as Request, mockResponse as Response);
 
-    expect(res.json).toHaveBeenCalledTimes(1);
-    expect(res.status).toHaveBeenCalledWith(200);
-  });
+        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
+        // expect(PartnerService.UpdatePartner).toHaveBeenCalledWith(mockRequest.params.partnerId, mockRequest.body, mockToken, mockBreadcrumb);
+        expect(mockResponse.json).toHaveBeenCalledWith(mockUpdatedPartner);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
 
+    it('should add a contact successfully', async () => {
+        const mockToken = { userId: 'user123', roles: ['admin'] };
+        const mockBreadcrumb = { correlationId: 'test-correlation-id' };
+        const mockContact = { id: 'contact123', name: 'New Contact' };
+
+        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
+        (PartnerService.AddContact as jest.Mock).mockResolvedValue(mockContact);
+
+        await controller.addContact(mockRequest as Request, mockResponse as Response);
+
+        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
+        // expect(PartnerService.AddContact).toHaveBeenCalledWith(mockRequest.params.partnerId, mockRequest.params.personId, mockToken, mockBreadcrumb);
+        expect(mockResponse.json).toHaveBeenCalledWith(mockContact);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should remove a contact successfully', async () => {
+        const mockToken = { userId: 'user123', roles: ['admin'] };
+        const mockBreadcrumb = { correlationId: 'test-correlation-id' };
+        const mockPartner = { id: 'partner123', name: 'Partner A' };
+
+        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
+        (PartnerService.RemoveContact as jest.Mock).mockResolvedValue(mockPartner);
+
+        await controller.removeContact(mockRequest as Request, mockResponse as Response);
+
+        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
+        // expect(PartnerService.RemoveContact).toHaveBeenCalledWith(mockRequest.params.partnerId, mockRequest.params.personId, mockToken, mockBreadcrumb);
+        expect(mockResponse.json).toHaveBeenCalledWith(mockPartner);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
 });

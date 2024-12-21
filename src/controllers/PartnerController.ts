@@ -1,110 +1,100 @@
-import MongoInterface from '../interfaces/MongoInterface';
+import PartnerService from '../services/PartnerService';
 import { Request, Response } from 'express';
+import { Token, createToken } from '../utils/Token';
+import { Breadcrumb, createBreadcrumb } from '../utils/Breadcrumb';
 
-export default class ConfigController {
-  mongo: MongoInterface;
+export default class PartnerController {
 
-  constructor(mongoIO: MongoInterface) {
-    this.mongo = mongoIO;
+  constructor() {
   }
 
   public getPartners = async (req: Request, res: Response) => {
     try {
-      const results = await this.mongo.findPartners();
-      console.info("GetPartners Completed");
-      res.status(200);
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const results = await PartnerService.FindPartners(req.query, token)
       res.json(results);
+      res.status(200);
+      console.info("GetPartners Completed", breadcrumb);
     } catch (error) {
-      let message = this.getMessage(error);
-      console.info("GetPartners Failed with:", message);
       res.status(500);
-      res.json(message);
+      console.info("GetPartners Failed:", error);
     }
   }
 
   public getPartner = async (req: Request, res: Response) => {
-    const theId = req.params.partnerId;
-
     try {
-      const thePartner = await this.mongo.findPartner(theId)
-      console.info("GetPartner %s Completed", theId);
-      res.status(200);
+      const theId = req.params.partnerId;
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const thePartner = await PartnerService.FindPartner(theId, token);
       res.json(thePartner);
+      res.status(200);
+      console.info("GetPartner %s Completed %s", theId, breadcrumb);
     } catch (error) {
-      let message = this.getMessage(error);
-      console.info("GetPartner %s Failed because %s", theId, message);
       res.status(500);
-      res.json(message);
+      console.info("GetPartner Failed:", error);
     }
     
   }
 
   public createPartner = async (req: Request, res: Response) => {
     try {
-      const newPartner = await this.mongo.insertPartner(req.body)
-      console.info("AddPartner Completed for %s", newPartner._id);
-      res.status(200);
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const newPartner = await PartnerService.InsertPartner(req.body, token, breadcrumb);
       res.json(newPartner);
+      res.status(200);
+      console.info("AddPartner Completed for %s", newPartner._id);
     } catch (error) {
-      let message = this.getMessage(error);
-      console.info("AddPartner Failed with %s", message);
       res.status(500);
-      res.json(message);
+      console.info("AddPartner Failed with %s", error);
     }
   }
 
   public updatePartner = async (req: Request, res: Response) => {
-    const id = req.params.partnerId;
-    
     try {
-      const thePartner = await this.mongo.updatePartner(id, req.body);
-      console.info("Update Partner Completed for %s", id);
-      res.status(200);
+      const id = req.params.partnerId;
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const thePartner = await PartnerService.UpdatePartner(id, req.body, token, breadcrumb);
       res.json(thePartner);
+      res.status(200);
+      console.info("Update Partner Completed:", breadcrumb);
     } catch (error) {
-      let message = this.getMessage(error);
-      console.info("UpdatePartner Failed for %s with %s", id, message);
       res.status(500);
-      res.json(message);
+      console.info("UpdatePartner Failed:", error);
     }
   }
 
-  public addContact = async (req: Request, res: Response) => {
-    const partnerId = req.params.partnerId;
-    const personId = req.params.personId;
-    
+  public addContact = async (req: Request, res: Response) => {    
     try {
-      const theContact = await this.mongo.addContact(partnerId, personId);
-      console.info("Add Contact %s to %s Complete", personId, partnerId);
-      res.status(200);
+      const partnerId = req.params.partnerId;
+      const personId = req.params.personId;
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const theContact = await PartnerService.AddContact(partnerId, personId, token, breadcrumb);
       res.json(theContact);
-    } catch (error) {
-      let message = this.getMessage(error);
-      console.info("Add Contact failed with %s", message);
-      res.status(500);
-      res.json(message);
-    }
-  }
-  public removeContact = async (req: Request, res: Response) => {
-    const partnerId = req.params.partnerId;
-    const personId = req.params.personId;
-    
-    try {
-      await this.mongo.removeContact(partnerId, personId);
       res.status(200);
-      res.json({});
-      console.info("Remove Contact %s to %s Complete", personId, partnerId);
+      console.info("Add Contact %s to %s Complete", personId, partnerId);
     } catch (error) {
-      let message = this.getMessage(error);
-      console.info("Remove Contact Failed with %s", message);
       res.status(500);
-      res.json(message);
+      console.info("Add Contact failed with %s", error);
     }
   }
-
-  private getMessage(error: any): string {
-    let message = 'Unknown Error'
-    if (error instanceof Error) message = error.message;
-    return message;
+  public removeContact = async (req: Request, res: Response) => {    
+    try {
+      const partnerId = req.params.partnerId;
+      const personId = req.params.personId;
+      const token = createToken(req);
+      const breadcrumb = createBreadcrumb(token, req);
+      const partner = await PartnerService.RemoveContact(partnerId, personId, token, breadcrumb);
+      res.json(partner);
+      res.status(200);
+      console.info("Remove Contact %s to %s Complete - %s", personId, partnerId, breadcrumb);
+    } catch (error) {
+      res.status(500);
+      console.info("Remove Contact Failed with %s", error);
+    }
   }
 }
