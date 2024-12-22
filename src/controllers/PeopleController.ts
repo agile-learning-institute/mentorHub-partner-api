@@ -15,10 +15,10 @@ export default class PeopleController {
       const results = await PeopleService.FindPeople(req.query, token);
       res.json(results);
       res.status(200);
-      console.info("GetPeople Completed", breadcrumb);
+      console.info("GetPeople Completed", JSON.stringify(breadcrumb));
     } catch (error) {
       res.status(500);
-      console.info("GetPeople Failed", error);
+      console.error("GetPeople Failed", error);
     }
   }
 }

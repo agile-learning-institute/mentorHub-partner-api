@@ -13,12 +13,14 @@ export default class PartnerController {
       const token = createToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const results = await PartnerService.FindPartners(req.query, token)
-      res.json(results);
       res.status(200);
-      console.info("GetPartners Completed", breadcrumb);
+      res.json(results);
+      console.info("GetPartners Completed", JSON.stringify(breadcrumb));
     } catch (error) {
+      const message = this.getMessage(error);
       res.status(500);
-      console.info("GetPartners Failed:", error);
+      res.json({error:message});
+      console.warn("GetPartners Failed:", message);
     }
   }
 
@@ -28,12 +30,14 @@ export default class PartnerController {
       const token = createToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const thePartner = await PartnerService.FindPartner(theId, token);
-      res.json(thePartner);
       res.status(200);
-      console.info("GetPartner %s Completed %s", theId, breadcrumb);
+      res.json(thePartner);
+      console.info("GetPartner %s Completed with %s", theId, JSON.stringify(breadcrumb));
     } catch (error) {
+      const message = this.getMessage(error);
       res.status(500);
-      console.info("GetPartner Failed:", error);
+      res.json({error:message});
+      console.warn("GetPartner Failed:", message);
     }
     
   }
@@ -43,12 +47,14 @@ export default class PartnerController {
       const token = createToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const newPartner = await PartnerService.InsertPartner(req.body, token, breadcrumb);
-      res.json(newPartner);
       res.status(200);
-      console.info("AddPartner Completed for %s", newPartner._id);
+      res.json(newPartner);
+      console.info("InsertPartner %s Completed with %s", newPartner._id, JSON.stringify(breadcrumb));
     } catch (error) {
+      const message = this.getMessage(error);
       res.status(500);
-      console.info("AddPartner Failed with %s", error);
+      res.json({error:message});
+      console.warn("InsertPartner Failed with %s", message);
     }
   }
 
@@ -58,12 +64,14 @@ export default class PartnerController {
       const token = createToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const thePartner = await PartnerService.UpdatePartner(id, req.body, token, breadcrumb);
-      res.json(thePartner);
       res.status(200);
-      console.info("Update Partner Completed:", breadcrumb);
+      res.json(thePartner);
+      console.info("Update Partner %s Completed with %s", id, JSON.stringify(breadcrumb));
     } catch (error) {
+      const message = this.getMessage(error);
       res.status(500);
-      console.info("UpdatePartner Failed:", error);
+      res.json({error:message});
+      console.warn("UpdatePartner Failed:", message);
     }
   }
 
@@ -74,12 +82,14 @@ export default class PartnerController {
       const token = createToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const theContact = await PartnerService.AddContact(partnerId, personId, token, breadcrumb);
-      res.json(theContact);
       res.status(200);
-      console.info("Add Contact %s to %s Complete", personId, partnerId);
+      res.json(theContact);
+      console.info("Add Contact %s to %s Complete with %s", personId, partnerId, JSON.stringify(breadcrumb));
     } catch (error) {
+      const message = this.getMessage(error);
       res.status(500);
-      console.info("Add Contact failed with %s", error);
+      res.json({error:message});
+      console.warn("Add Contact failed with %s", message);
     }
   }
   public removeContact = async (req: Request, res: Response) => {    
@@ -89,12 +99,19 @@ export default class PartnerController {
       const token = createToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const partner = await PartnerService.RemoveContact(partnerId, personId, token, breadcrumb);
-      res.json(partner);
       res.status(200);
-      console.info("Remove Contact %s to %s Complete - %s", personId, partnerId, breadcrumb);
+      res.json(partner);
+      console.info("Remove Contact %s to %s Complete with %s", personId, partnerId, JSON.stringify(breadcrumb));
     } catch (error) {
+      const message = this.getMessage(error);
       res.status(500);
-      console.info("Remove Contact Failed with %s", error);
+      res.json({error:message});
+      console.warn("Remove Contact Failed with %s", message);
     }
+  }
+
+  public getMessage(error: any): string {
+    if (error instanceof Error) return error.message;
+    return String(error);
   }
 }

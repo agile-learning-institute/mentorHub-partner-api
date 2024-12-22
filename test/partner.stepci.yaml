@@ -26,10 +26,13 @@ tests:
                   type: array
                 enumerators:
                   type: object
+                token:
+                  type: object
               required:
                 - configItems
                 - versions
                 - enumerators
+                - token
               additionalProperties: false
   observable-health:
     name: Observability - Health
@@ -126,12 +129,15 @@ tests:
                         type: string
                       lastName:
                         type: string
+                      eMail:
+                        type: string
                       phone:
                         type: string
                     required:
                       - _id
                       - firstName
                       - lastName
+                      - eMail
                       - phone
                 lastSaved:
                   type: object
@@ -160,7 +166,7 @@ tests:
                 - lastSaved
               additionalProperties: false
   partner-get-notfound:
-    name: Get Partner
+    name: Get Partner Not Found
     steps:
       - name: Try to get an invalid partner
         http:

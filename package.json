@@ -7,7 +7,7 @@
     "test": "jest --coverage",
     "prestart": "mh down; mh up mongodb; tsc",
     "start": "npm run local",
-    "local": "node dist/server.js",
+    "local": "npm run build; node dist/server.js",
     "stepci": "stepci run ./test/partner.stepci.yaml",
     "preblackbox": "npm run container",
     "blackbox": "npm run stepci",

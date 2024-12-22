@@ -1,0 +1,19 @@
+version: "1.1"
+name: Partner API Check
+env:
+  host: localhost:8084
+config:
+  loadTest:
+    phases:
+      - duration: 5
+        arrivalRate: 50
+tests:
+  partner-get-notfound:
+    name: Get Partner Not Found
+    steps:
+      - name: Try to get an invalid partner
+        http:
+          url: http://${{env.host}}/api/partner/123456789012345678901234
+          method: GET
+          check:
+            status: /500/
