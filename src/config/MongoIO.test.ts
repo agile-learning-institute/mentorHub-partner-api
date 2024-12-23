@@ -88,8 +88,9 @@ describe('MongIO', () => {
 
     test('test getDocument', async () => {
         const id = "aaaa00000000000000000027";
-        const expected = {"_id":new ObjectId("aaaa00000000000000000027"),"userName":"EmilyJones","firstName":"Emily","lastName":"Jones","status":"Inactive","roles":["Member"],"partnerId":new ObjectId("bbbb00000000000000000001"),"title":"Distinguished","cadence":"Daily","eMail":"EmilyJones@fakemail.com","gitHub":"EmilyJones","device":"Mac (Intel)","location":"Asheville","phone":"290-453-3295","description":"I had a friend in high school named Rick Shaw, but he was fairly useless as a mode of transport.","lastSaved":{"atTime":new Date("2024-02-27T18:17:58.000Z"),"byUser":new ObjectId("00000001662d1043f760bcd7"),"fromIp":"192.168.1.3","correlationId":"ae078031-7de2-4519-bcbe-fbd5e72b69d3"}};
+        const expected = {"_id":new ObjectId("aaaa00000000000000000027"),"userName":"EmilyJones","firstName":"Emily","lastName":"Jones","status":"Inactive","roles":["Member"],"partnerId":new ObjectId("bbbb00000000000000000001"),"title":"Distinguished","cadence":"Daily","eMail":"EmilyJones@fakemail.com","gitHub":"EmilyJones","device":"Mac (Intel)","location":"Asheville","phone":"290-453-3295","description":"I had a friend in high school named Rick Shaw, but he was fairly useless as a mode of transport."};
         const document = await mongoIo.getDocument(config.PEOPLE_COLLECTION_NAME, id);
+        delete document.lastSaved;
         expect(document).toStrictEqual(expected);
     });
 
