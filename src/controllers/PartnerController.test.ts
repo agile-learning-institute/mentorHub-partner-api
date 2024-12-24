@@ -1,13 +1,16 @@
 import PartnerController from '../controllers/PartnerController';
 import PartnerService from '../services/PartnerService';
-import { createBreadcrumb } from '../expressUtils/Breadcrumb';
-import { createToken } from '../expressUtils/Token';
+import { decodeToken, createBreadcrumb } from '@agile-learning-institute/mentorhub-ts-api-utils';
 import { Request, Response } from 'express';
 
-// Mock dependencies
+// Mock PartnerService
 jest.mock('../services/PartnerService');
-jest.mock('../expressUtils/Breadcrumb');
-jest.mock('../expressUtils/Token');
+
+// Mock the utility module
+jest.mock('@agile-learning-institute/mentorhub-ts-api-utils', () => ({
+  decodeToken: jest.fn(),
+  createBreadcrumb: jest.fn(),
+}));
 
 describe('PartnerController', () => {
     let controller: PartnerController;
@@ -40,13 +43,13 @@ describe('PartnerController', () => {
         const mockBreadcrumb = { correlationId: 'test-correlation-id' };
         const mockResults = [{ name: 'Partner A' }, { name: 'Partner B' }];
 
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PartnerService.FindPartners as jest.Mock).mockResolvedValue(mockResults);
 
         await controller.getPartners(mockRequest as Request, mockResponse as Response);
 
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         expect(PartnerService.FindPartners).toHaveBeenCalledWith(mockRequest.query, mockToken);
         expect(mockResponse.json).toHaveBeenCalledWith(mockResults);
@@ -58,13 +61,13 @@ describe('PartnerController', () => {
         const mockBreadcrumb = { correlationId: 'test-correlation-id' };
         const mockPartner = { id: 'partner123', name: 'Partner A' };
 
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PartnerService.FindPartner as jest.Mock).mockResolvedValue(mockPartner);
 
         await controller.getPartner(mockRequest as Request, mockResponse as Response);
 
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         // expect(PartnerService.FindPartner).toHaveBeenCalledWith(mockRequest.params.partnerId, mockToken);
         expect(mockResponse.json).toHaveBeenCalledWith(mockPartner);
@@ -76,13 +79,13 @@ describe('PartnerController', () => {
         const mockBreadcrumb = { correlationId: 'test-correlation-id' };
         const mockNewPartner = { _id: 'partner123', name: 'New Partner' };
 
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PartnerService.InsertPartner as jest.Mock).mockResolvedValue(mockNewPartner);
 
         await controller.createPartner(mockRequest as Request, mockResponse as Response);
 
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         expect(PartnerService.InsertPartner).toHaveBeenCalledWith(mockRequest.body, mockToken, mockBreadcrumb);
         expect(mockResponse.json).toHaveBeenCalledWith(mockNewPartner);
@@ -94,13 +97,13 @@ describe('PartnerController', () => {
         const mockBreadcrumb = { correlationId: 'test-correlation-id' };
         const mockUpdatedPartner = { id: 'partner123', name: 'Updated Partner' };
 
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PartnerService.UpdatePartner as jest.Mock).mockResolvedValue(mockUpdatedPartner);
 
         await controller.updatePartner(mockRequest as Request, mockResponse as Response);
 
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         // expect(PartnerService.UpdatePartner).toHaveBeenCalledWith(mockRequest.params.partnerId, mockRequest.body, mockToken, mockBreadcrumb);
         expect(mockResponse.json).toHaveBeenCalledWith(mockUpdatedPartner);
@@ -112,13 +115,13 @@ describe('PartnerController', () => {
         const mockBreadcrumb = { correlationId: 'test-correlation-id' };
         const mockContact = { id: 'contact123', name: 'New Contact' };
 
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PartnerService.AddContact as jest.Mock).mockResolvedValue(mockContact);
 
         await controller.addContact(mockRequest as Request, mockResponse as Response);
 
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         // expect(PartnerService.AddContact).toHaveBeenCalledWith(mockRequest.params.partnerId, mockRequest.params.personId, mockToken, mockBreadcrumb);
         expect(mockResponse.json).toHaveBeenCalledWith(mockContact);
@@ -130,13 +133,13 @@ describe('PartnerController', () => {
         const mockBreadcrumb = { correlationId: 'test-correlation-id' };
         const mockPartner = { id: 'partner123', name: 'Partner A' };
 
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PartnerService.RemoveContact as jest.Mock).mockResolvedValue(mockPartner);
 
         await controller.removeContact(mockRequest as Request, mockResponse as Response);
 
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         // expect(PartnerService.RemoveContact).toHaveBeenCalledWith(mockRequest.params.partnerId, mockRequest.params.personId, mockToken, mockBreadcrumb);
         expect(mockResponse.json).toHaveBeenCalledWith(mockPartner);

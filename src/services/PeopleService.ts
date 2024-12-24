@@ -2,9 +2,7 @@
  * Class PeopleService: This is a stateless static class that
  *    provides business logic and RBAC for the PeopleController
  */
-import Config from "../config/Config";
-import MongoIO from "../mongoUtils/MongoIO";
-import { Token } from "../expressUtils/Token";
+import {Config, Token, MongoIO} from '@agile-learning-institute/mentorhub-ts-api-utils';
 
 export default class PeopleService {
     

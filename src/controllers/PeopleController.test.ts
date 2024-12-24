@@ -1,14 +1,15 @@
 import PeopleController from '../controllers/PeopleController';
 import PeopleService from '../services/PeopleService';
-import { createBreadcrumb } from '../expressUtils/Breadcrumb';
-import { createToken } from '../expressUtils/Token';
+import { decodeToken, createBreadcrumb } from '@agile-learning-institute/mentorhub-ts-api-utils';
 import { Request, Response } from 'express';
 
 // Mock dependencies
-jest.mock('../expressUtils/Breadcrumb');
-jest.mock('../expressUtils/Token');
 jest.mock('../services/PeopleService');
-
+jest.mock('@agile-learning-institute/mentorhub-ts-api-utils', () => ({
+    decodeToken: jest.fn(),
+    createBreadcrumb: jest.fn(),
+  }));
+  
 describe('PeopleController', () => {
     let controller: PeopleController;
     let mockRequest: Partial<Request>;
@@ -41,7 +42,7 @@ describe('PeopleController', () => {
         const mockResults = [{ name: 'John Doe', age: 30 }];
 
         // Mock functions
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PeopleService.FindPeople as jest.Mock).mockResolvedValue(mockResults);
 
@@ -49,7 +50,7 @@ describe('PeopleController', () => {
         await controller.getPeople(mockRequest as Request, mockResponse as Response);
 
         // Assertions
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         expect(PeopleService.FindPeople).toHaveBeenCalledWith(mockRequest.query, mockToken);
         expect(mockResponse.json).toHaveBeenCalledWith(mockResults);
@@ -62,7 +63,7 @@ describe('PeopleController', () => {
         const mockError = new Error('FindPeople Failed');
 
         // Mock functions
-        (createToken as jest.Mock).mockReturnValue(mockToken);
+        (decodeToken as jest.Mock).mockReturnValue(mockToken);
         (createBreadcrumb as jest.Mock).mockReturnValue(mockBreadcrumb);
         (PeopleService.FindPeople as jest.Mock).mockRejectedValue(mockError);
 
@@ -70,7 +71,7 @@ describe('PeopleController', () => {
         await controller.getPeople(mockRequest as Request, mockResponse as Response);
 
         // Assertions
-        expect(createToken).toHaveBeenCalledWith(mockRequest);
+        expect(decodeToken).toHaveBeenCalledWith(mockRequest);
         expect(createBreadcrumb).toHaveBeenCalledWith(mockToken, mockRequest);
         expect(PeopleService.FindPeople).toHaveBeenCalledWith(mockRequest.query, mockToken);
         expect(mockResponse.status).toHaveBeenCalledWith(500);

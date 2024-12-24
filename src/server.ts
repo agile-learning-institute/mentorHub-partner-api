@@ -1,10 +1,8 @@
 import express from 'express';
 import http from 'http';
-import Config from './config/Config';
+import {Config, ConfigController, MongoIO} from '@agile-learning-institute/mentorhub-ts-api-utils';
 import PartnerController from './controllers/PartnerController';
-import ConfigController from './controllers/ConfigController';
 import PeopleController from './controllers/PeopleController';
-import MongoIO from './config/MongoIO'
 import promBundle from 'express-prom-bundle'; 
 
 export class Server {

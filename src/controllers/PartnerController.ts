@@ -1,7 +1,6 @@
 import PartnerService from '../services/PartnerService';
 import { Request, Response } from 'express';
-import { Token, createToken } from '../expressUtils/Token';
-import { Breadcrumb, createBreadcrumb } from '../expressUtils/Breadcrumb';
+import { decodeToken, createBreadcrumb } from '@agile-learning-institute/mentorhub-ts-api-utils';
 
 export default class PartnerController {
 
@@ -10,7 +9,7 @@ export default class PartnerController {
 
   public getPartners = async (req: Request, res: Response) => {
     try {
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const results = await PartnerService.FindPartners(req.query, token)
       res.status(200);
@@ -27,7 +26,7 @@ export default class PartnerController {
   public getPartner = async (req: Request, res: Response) => {
     try {
       const theId = req.params.partnerId;
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const thePartner = await PartnerService.FindPartner(theId, token);
       res.status(200);
@@ -44,7 +43,7 @@ export default class PartnerController {
 
   public createPartner = async (req: Request, res: Response) => {
     try {
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const newPartner = await PartnerService.InsertPartner(req.body, token, breadcrumb);
       res.status(200);
@@ -61,7 +60,7 @@ export default class PartnerController {
   public updatePartner = async (req: Request, res: Response) => {
     try {
       const id = req.params.partnerId;
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const thePartner = await PartnerService.UpdatePartner(id, req.body, token, breadcrumb);
       res.status(200);
@@ -79,7 +78,7 @@ export default class PartnerController {
     try {
       const partnerId = req.params.partnerId;
       const personId = req.params.personId;
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const theContact = await PartnerService.AddContact(partnerId, personId, token, breadcrumb);
       res.status(200);
@@ -96,7 +95,7 @@ export default class PartnerController {
     try {
       const partnerId = req.params.partnerId;
       const personId = req.params.personId;
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const partner = await PartnerService.RemoveContact(partnerId, personId, token, breadcrumb);
       res.status(200);

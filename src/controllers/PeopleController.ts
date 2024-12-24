@@ -1,7 +1,6 @@
 import PeopleService from '../services/PeopleService';
 import { Request, Response } from 'express';
-import { createBreadcrumb } from '../expressUtils/Breadcrumb';
-import { createToken } from '../expressUtils/Token';
+import { decodeToken, createBreadcrumb } from '@agile-learning-institute/mentorhub-ts-api-utils';
 
 export default class PeopleController {
 
@@ -10,7 +9,7 @@ export default class PeopleController {
 
   public getPeople = async (req: Request, res: Response) => {
     try {
-      const token = createToken(req);
+      const token = decodeToken(req);
       const breadcrumb = createBreadcrumb(token, req);
       const results = await PeopleService.FindPeople(req.query, token);
       res.json(results);
