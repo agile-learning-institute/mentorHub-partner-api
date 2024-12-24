@@ -1,5 +1,5 @@
 import { MongoClient, Db, Collection, InsertOneResult, IntegerType, ObjectId } from 'mongodb';
-import Config from './Config';
+import Config from '../config/Config';
 
 
 /********************************************************************************

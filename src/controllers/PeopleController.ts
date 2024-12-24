@@ -1,7 +1,7 @@
 import PeopleService from '../services/PeopleService';
 import { Request, Response } from 'express';
-import { createBreadcrumb } from '../utils/Breadcrumb';
-import { createToken } from '../utils/Token';
+import { createBreadcrumb } from '../expressUtils/Breadcrumb';
+import { createToken } from '../expressUtils/Token';
 
 export default class PeopleController {
 

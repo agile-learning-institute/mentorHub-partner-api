@@ -3,8 +3,8 @@
  *    provides business logic and RBAC for the PeopleController
  */
 import Config from "../config/Config";
-import MongoIO from "../config/MongoIO";
-import { Token } from "../utils/Token";
+import MongoIO from "../mongoUtils/MongoIO";
+import { Token } from "../expressUtils/Token";
 
 export default class PeopleService {
     

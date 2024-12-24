@@ -1,12 +1,12 @@
 import PeopleController from '../controllers/PeopleController';
 import PeopleService from '../services/PeopleService';
-import { createBreadcrumb } from '../utils/Breadcrumb';
-import { createToken } from '../utils/Token';
+import { createBreadcrumb } from '../expressUtils/Breadcrumb';
+import { createToken } from '../expressUtils/Token';
 import { Request, Response } from 'express';
 
 // Mock dependencies
-jest.mock('../utils/Breadcrumb');
-jest.mock('../utils/Token');
+jest.mock('../expressUtils/Breadcrumb');
+jest.mock('../expressUtils/Token');
 jest.mock('../services/PeopleService');
 
 describe('PeopleController', () => {

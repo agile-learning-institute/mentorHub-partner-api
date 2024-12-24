@@ -1,7 +1,7 @@
 import PartnerService from '../services/PartnerService';
 import { Request, Response } from 'express';
-import { Token, createToken } from '../utils/Token';
-import { Breadcrumb, createBreadcrumb } from '../utils/Breadcrumb';
+import { Token, createToken } from '../expressUtils/Token';
+import { Breadcrumb, createBreadcrumb } from '../expressUtils/Breadcrumb';
 
 export default class PartnerController {
 

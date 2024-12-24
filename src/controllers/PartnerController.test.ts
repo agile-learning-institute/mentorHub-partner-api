@@ -1,13 +1,13 @@
 import PartnerController from '../controllers/PartnerController';
 import PartnerService from '../services/PartnerService';
-import { createBreadcrumb } from '../utils/Breadcrumb';
-import { createToken } from '../utils/Token';
+import { createBreadcrumb } from '../expressUtils/Breadcrumb';
+import { createToken } from '../expressUtils/Token';
 import { Request, Response } from 'express';
 
 // Mock dependencies
 jest.mock('../services/PartnerService');
-jest.mock('../utils/Breadcrumb');
-jest.mock('../utils/Token');
+jest.mock('../expressUtils/Breadcrumb');
+jest.mock('../expressUtils/Token');
 
 describe('PartnerController', () => {
     let controller: PartnerController;

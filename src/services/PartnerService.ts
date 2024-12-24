@@ -4,9 +4,9 @@
  */
 import { ObjectId } from "mongodb";
 import Config from "../config/Config";
-import MongoIO from "../config/MongoIO";
-import { Breadcrumb } from "../utils/Breadcrumb";
-import { Token } from "../utils/Token";
+import MongoIO from "../mongoUtils/MongoIO";
+import { Breadcrumb } from "../expressUtils/Breadcrumb";
+import { Token } from "../expressUtils/Token";
 
 export default class PartnerService {
     

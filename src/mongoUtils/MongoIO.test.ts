@@ -4,7 +4,7 @@
  * mh up mongodb
  */
 import MongoIO from './MongoIO';
-import Config from './Config';
+import Config from '../config/Config';
 import { ObjectId } from 'mongodb';
 
 describe('MongIO', () => {
