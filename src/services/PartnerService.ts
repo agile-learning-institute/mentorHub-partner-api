@@ -3,10 +3,7 @@
  *    provides business logic and RBAC for the PeopleController
  */
 import { ObjectId } from "mongodb";
-import Config from "../config/Config";
-import MongoIO from "../config/MongoIO";
-import { Breadcrumb } from "../utils/Breadcrumb";
-import { Token } from "../utils/Token";
+import {Config, Breadcrumb, Token, MongoIO} from '@agile-learning-institute/mentorhub-ts-api-utils';
 
 export default class PartnerService {
     

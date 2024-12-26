@@ -1,4 +1,3 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -6,4 +5,8 @@ module.exports = {
     "/node_modules/",
     "/dist/",
   ],
+  moduleNameMapper: {
+    '^@agile-learning-institute/mentorhub-ts-api-utils$': '<rootDir>/node_modules/@agile-learning-institute/mentorhub-ts-api-utils/dist/index.js',
+  },
+  moduleDirectories: ['node_modules', 'src'],
 };
