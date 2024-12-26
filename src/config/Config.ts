@@ -13,7 +13,7 @@ interface ConfigItem {
     from: string;
 }
 
-export  class Config {
+export default class Config {
     private static instance: Config; // Singleton 
 
     configItems: ConfigItem[] = [];
@@ -168,7 +168,6 @@ export  class Config {
         return Config.instance;
     }
 
-
     public withToken(token: any): any {
         return {
             "configItems": this.configItems,
@@ -178,7 +177,3 @@ export  class Config {
         };    
     }
 }
-
-// Create a singleton instance of Config and export it
-const config = Config.getInstance();
-export default config;

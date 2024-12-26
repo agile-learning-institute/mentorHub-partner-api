@@ -1,6 +1,6 @@
 import express from 'express';
 import http from 'http';
-import config from './config/Config';
+import Config from './config/Config';
 import PartnerController from './controllers/PartnerController';
 import ConfigController from './controllers/ConfigController';
 import PeopleController from './controllers/PeopleController';
@@ -8,11 +8,14 @@ import MongoIO from './config/MongoIO'
 import promBundle from 'express-prom-bundle'; 
 
 export class Server {
+    private config: Config;
     private mongoIO: MongoIO;
     private server?: http.Server;
 
-    constructor(mongoIO: MongoIO) {
-        this.mongoIO = mongoIO;
+    constructor() {
+        this.config = Config.getInstance();
+        this.mongoIO = MongoIO.getInstance();
+        this.mongoIO.connect(this.config.PARTNERS_COLLECTION_NAME);
     }
 
     public async serve() {
@@ -29,8 +32,8 @@ export class Server {
         app.use(metricsMiddleware);
 
         // Create controllers, inject dependencies
-        const partnerController = new PartnerController(this.mongoIO);
-        const peopleController = new PeopleController(this.mongoIO);
+        const partnerController = new PartnerController();
+        const peopleController = new PeopleController();
         const configController = new ConfigController();
 
         // Map routes to controllers
@@ -44,7 +47,7 @@ export class Server {
         app.get('/api/config/', (req, res) => configController.getConfig(req, res));
 
         // Start Server
-        const port = config.PARTNERS_API_PORT;
+        const port = this.config.PARTNERS_API_PORT;
         this.server = app.listen(port, () => {
             console.log(`Server running on port ${port}`);
         });
@@ -74,10 +77,6 @@ export class Server {
 
 // Start the server
 (async () => {
-    const mongo = new MongoIO();
-    await mongo.connect();
-    await mongo.loadVersions();
-    await mongo.loadEnumerators(config.PARTNERS_COLLECTION_NAME);
-    const server = new Server(mongo);
+    const server = new Server();
     await server.serve();
 })();
