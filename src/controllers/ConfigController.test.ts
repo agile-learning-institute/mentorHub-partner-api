@@ -1,4 +1,3 @@
-import config from '../config/Config';
 import ConfigController from './ConfigController';
 import { Request, Response } from 'express';
 
@@ -36,7 +35,5 @@ describe('ConfigController', () => {
     expect(jsonResponse).toHaveProperty('configItems');
     expect(jsonResponse).toHaveProperty('versions');
     expect(jsonResponse).toHaveProperty('enumerators');
-    expect(jsonResponse).toHaveProperty('apiVersion');
-    expect(jsonResponse.apiVersion).toEqual("1.0.LOCAL");
   });
 });

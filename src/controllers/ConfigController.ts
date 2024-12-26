@@ -7,7 +7,7 @@ export default class ConfigController {
   }
 
   public getConfig = async (req: Request, res: Response) => {
-    res.json(config);
+    res.json(config.withToken({}));
     res.status(200);
     console.info("GetConfig Completed");
   };
